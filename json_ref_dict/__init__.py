@@ -122,9 +122,7 @@ class RefList(UserList):  # pylint: disable=too-many-ancestors
     def __getitem__(self, index: Union[int, slice]):
         """Propagate ref resolution behaviour to nested objects."""
         if isinstance(index, slice):
-            raise TypeError(
-                "JSON pointers do not support slice indexes!"
-            )
+            raise TypeError("JSON pointers do not support slice indexes!")
         item = super().__getitem__(index)
         uri = self.uri.get(str(index))
         return propagate(uri, item)
@@ -202,14 +200,14 @@ def _resolve_in_document(uri: URI, document: Dict):
 @singledispatch
 def _get_breadcrumb(data: Any, breadcrumb: str) -> T:
     """Single dispatch to resolve JSON Pointer fragments."""
-    raise ValueError(
-        f"Cannot retrieve member of non-array/object item {data}."
-    )
+    raise ValueError(f"Cannot retrieve member of non-array/object item {data}.")
+
 
 @_get_breadcrumb.register(dict)
 def _get_breadcrumb_dict(data: Dict, breadcrumb: str) -> T:
     """If the data is a dict, simply attempt to get the member."""
     return data[breadcrumb]
+
 
 @_get_breadcrumb.register(list)
 def _get_breadcrumb_list(data: List, breadcrumb: str) -> T:

@@ -15,6 +15,8 @@ Types of changes are:
 ## [Unreleased]
 ### Added
 * Project started :)
+* Added `RefDict` class for loading related schemas by URI.
+* Added File-system loading support.
 
 ## [0.0.0]
 Nothing here.

@@ -22,6 +22,12 @@ TEST_DATA = {
             "nested": {"back": {"$ref": "file1.json#/definitions/qux"}},
         }
     },
+    "base/reflist.json": {
+        "definitions": {
+            "foo": {"not": [{"$ref": "#/definitions/baz"}]},
+            "baz": {"type": "object"},
+        }
+    },
 }
 
 
@@ -80,3 +86,14 @@ def test_get_load_dict_remote_ref(ref_dict: RefDict):
 
 def test_get_load_dict_backref(ref_dict: RefDict):
     assert ref_dict["backref"] == {"type": "null"}
+
+
+def test_references_propagate_through_arrays():
+    ref_dict = RefDict("base/reflist.json#/definitions")
+    assert ref_dict["foo"]["not"][0] == {"type": "object"}
+
+
+def test_direct_reference_retrieval_in_array():
+    assert RefDict("base/reflist.json#/definitions/foo/not/0") == {
+        "type": "object"
+    }

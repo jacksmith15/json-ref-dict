@@ -7,8 +7,8 @@ dictionary.
 If `yaml` is installed, loading of yaml schemas is supported, otherwise
 standard library `json` is used.
 """
-from collections import UserDict
-from functools import lru_cache
+from collections import UserDict, UserList
+from functools import lru_cache, singledispatch
 from os import path
 import re
 from typing import Any, Callable, Dict, List, NamedTuple, TypeVar, Union
@@ -97,11 +97,48 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
     def __getitem__(self, key: str):
         """Propagate ref resolution behaviour to nested objects."""
         item = super().__getitem__(key)
-        if isinstance(item, dict):
-            if "$ref" in item:
-                return self.__class__(self.uri.relative(item["$ref"]))
-            return self.__class__(self.uri.get(key))
-        return item
+        uri = self.uri.get(key)
+        return propagate(uri, item)
+
+
+class RefList(UserList):  # pylint: disable=too-many-ancestors
+    """List for abstracting ref resolution in JSONSchemas.
+
+    Accepts a base URI as its argument, and subsequently can be
+    accessed as any other list. Behaviour propagates to
+    nested items.
+    """
+
+    def __init__(self, uri: Union[str, URI], *args, **kwargs):
+        """On instantiation, retrieve the data from the URI."""
+        self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
+        value = _get_uri(self.uri)
+        if not isinstance(value, list):
+            raise TypeError(
+                f"The value at '{uri}' is not an array. Got '{value}'."
+            )
+        super().__init__(value)
+
+    def __getitem__(self, index: Union[int, slice]):
+        """Propagate ref resolution behaviour to nested objects."""
+        if isinstance(index, slice):
+            raise TypeError(
+                "JSON pointers do not support slice indexes!"
+            )
+        item = super().__getitem__(index)
+        uri = self.uri.get(str(index))
+        return propagate(uri, item)
+
+
+def propagate(uri: URI, value: Any):
+    """Ref resolution and propagation of behaviours on __getitem__."""
+    if isinstance(value, dict):
+        if "$ref" in value:
+            return RefDict(uri.relative(value["$ref"]))
+        return RefDict(uri)
+    if isinstance(value, list):
+        return RefList(uri)
+    return value
 
 
 @lru_cache(maxsize=None)
@@ -131,11 +168,9 @@ def get_document(uri: URI):
         ) from exc
 
 
-def _get_bypass_ref(
-    uri: URI, data: Dict[str, Any], breadcrumb: str
-) -> T:
+def _get_bypass_ref(uri: URI, data: Union[List, Dict], breadcrumb: str) -> T:
     """Get a key from a document, resolving refs on the result if present."""
-    output = data[breadcrumb]
+    output = _get_breadcrumb(data, breadcrumb)
     if isinstance(output, dict) and "$ref" in output:
         return _get_uri(uri.relative(output["$ref"]))
     return output
@@ -156,9 +191,33 @@ def _resolve_in_document(uri: URI, document: Dict):
             continue
         try:
             output = _get_bypass_ref(uri, output, breadcrumb)
-        except KeyError as exc:
+        except (KeyError, ValueError) as exc:
             raise KeyError(
                 f"Failed to parse '{uri}'. Couldn't resolve "
                 f"{breadcrumbs[:idx + 1]}"
             ) from exc
     return output
+
+
+@singledispatch
+def _get_breadcrumb(data: Any, breadcrumb: str) -> T:
+    """Single dispatch to resolve JSON Pointer fragments."""
+    raise ValueError(
+        f"Cannot retrieve member of non-array/object item {data}."
+    )
+
+@_get_breadcrumb.register(dict)
+def _get_breadcrumb_dict(data: Dict, breadcrumb: str) -> T:
+    """If the data is a dict, simply attempt to get the member."""
+    return data[breadcrumb]
+
+@_get_breadcrumb.register(list)
+def _get_breadcrumb_list(data: List, breadcrumb: str) -> T:
+    """If the data is an array, ensure the fragment is an int."""
+    try:
+        index = int(breadcrumb)
+    except ValueError as exc:
+        raise ValueError(
+            f"Got string index {breadcrumb} for array element."
+        ) from exc
+    return data[index]

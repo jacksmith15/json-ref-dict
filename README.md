@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/jacksmith15/json-ref-dict.svg?token=JrMQr8Ynsmu5tphpTQ2p&branch=master)](https://travis-ci.com/jacksmith15/json-ref-dict)
+[![Build Status](https://travis-ci.com/jacksmith15/json-ref-dict.svg?branch=master)](https://travis-ci.com/jacksmith15/json-ref-dict)
 # JSONSchema Ref Dict
 Python dict-like object which abstracts resolution of JSONSchema references.
 

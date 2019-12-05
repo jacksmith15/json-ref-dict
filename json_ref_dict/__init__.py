@@ -8,6 +8,7 @@ If `yaml` is installed, loading of yaml schemas is supported, otherwise
 standard library `json` is used.
 """
 from collections import UserDict
+from functools import lru_cache
 from os import path
 import re
 from typing import Any, Callable, Dict, List, NamedTuple, TypeVar, Union
@@ -90,9 +91,10 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
             raise TypeError(
                 f"The value at '{uri}' is not an object. Got '{value}'."
             )
-        super().__init__(**_get_uri(self.uri))
+        super().__init__(**value)
 
     def __getitem__(self, key: str):
+        """Propagate"""
         item = super().__getitem__(key)
         if isinstance(item, dict):
             if "$ref" in item:
@@ -101,6 +103,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
         return item
 
 
+@lru_cache(maxsize=None)
 def _get_uri(uri: URI) -> T:
     """Find the value for a given URI.
 
@@ -128,7 +131,7 @@ def get_document(uri: URI):
 
 def _get_bypass_ref(
     uri: URI, data: Dict[str, Any], breadcrumb: str
-) -> Dict[str, Any]:
+) -> T:
     """Get a key from a document, resolving refs on the result if present."""
     output = data[breadcrumb]
     if isinstance(output, dict) and "$ref" in output:

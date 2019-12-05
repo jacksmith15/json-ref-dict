@@ -85,6 +85,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
     """
 
     def __init__(self, uri: Union[str, URI], *args, **kwargs):
+        """On instantiation, retrieve the data from the URI."""
         self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
         value = _get_uri(self.uri)
         if not isinstance(value, dict):

@@ -1,0 +1,5 @@
+definitions:
+  bar:
+    type: integer
+  baz:
+    $ref: 'master.yaml#/definitions/foo'

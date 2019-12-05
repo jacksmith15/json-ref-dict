@@ -1,0 +1,9 @@
+definitions:
+  foo:
+    type: string
+  local_ref:
+    $ref: '#/definitions/foo'
+  remote_ref:
+    $ref: 'other.yaml#/definitions/bar'
+  backref:
+    $ref: 'other.yaml#/definitions/baz'

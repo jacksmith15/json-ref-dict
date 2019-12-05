@@ -94,7 +94,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
         super().__init__(**value)
 
     def __getitem__(self, key: str):
-        """Propagate"""
+        """Propagate ref resolution behaviour to nested objects."""
         item = super().__getitem__(key)
         if isinstance(item, dict):
             if "$ref" in item:

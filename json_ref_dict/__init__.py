@@ -114,6 +114,7 @@ def _get_uri(uri: URI) -> T:
     return _resolve_in_document(uri, document)
 
 
+@lru_cache(maxsize=None)
 def get_document(uri: URI):
     """Load a document based on URI root.
 

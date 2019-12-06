@@ -1,7 +1,7 @@
 from typing import Any, Dict, Iterable, Tuple, Union
 from unittest.mock import patch
 
-from jsonpointer import JsonPointer
+from jsonpointer import JsonPointer, JsonPointerException
 import pytest
 
 from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
@@ -213,3 +213,17 @@ class TestRefPointer:
     ):
         pointer = RefPointer(uri.get("definitions", *path))
         assert pointer.to_last(document) == expected
+
+    @staticmethod
+    def test_ref_pointer_raises_on_no_match(uri: URI, document: Dict[str, Any]):
+        with pytest.raises(JsonPointerException):
+            _ = RefPointer(uri.get("nonexistent")).resolve(document)
+
+    @staticmethod
+    def test_ref_pointer_returns_default_if_no_match(
+        uri: URI, document: Dict[str, Any]
+    ):
+        default = "default"
+        assert RefPointer(uri.get("nonexistent")).resolve(
+            document, default=default
+        )

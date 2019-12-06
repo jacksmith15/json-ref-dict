@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.1.0] - 2019-12-06
 ### Added
 * Project started :)
 * Added `RefDict` class for loading related schemas by URI.
@@ -29,3 +31,5 @@ Nothing here.
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.1.0..HEAD
+[0.1.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.0.0..0.1.0

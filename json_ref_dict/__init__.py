@@ -13,4 +13,4 @@ from json_ref_dict.ref_pointer import RefPointer, resolve_uri
 from json_ref_dict.ref_dict import RefDict
 
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"

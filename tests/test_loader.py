@@ -3,7 +3,7 @@ from os import getcwd, path
 import pytest
 
 from json_ref_dict import RefDict
-from json_ref_dict.exceptions import DocumentParseError
+from json_ref_dict.exceptions import DocumentParseError, ReferenceParseError
 
 
 PINNED_FILE_URL = (
@@ -69,3 +69,8 @@ class TestRefDictIORefs:
     def test_loading_unknown_file_raises_document_parse_error():
         with pytest.raises(DocumentParseError):
             _ = RefDict("tests/schemas/nonexistent.yaml#/definitions")
+
+
+def test_immediately_circular_reference_fails():
+    with pytest.raises(ReferenceParseError):
+        _ = RefDict("tests/schemas/bad-circular.yaml#/definitions/foo")

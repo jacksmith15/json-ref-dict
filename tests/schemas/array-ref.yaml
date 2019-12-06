@@ -1,0 +1,7 @@
+definitions:
+  foo:
+    oneOf:
+    - $ref: '#/definitions/bar'
+    - type: 'null'
+  bar:
+    type: string

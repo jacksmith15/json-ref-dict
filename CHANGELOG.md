@@ -16,6 +16,9 @@ Types of changes are:
 ### Fixed
 * Regular expression in release tool.
 
+### Added
+* `materialize` function for resolving all references in a single step.
+
 ## [0.1.0] - 2019-12-06
 ### Added
 * Project started :)

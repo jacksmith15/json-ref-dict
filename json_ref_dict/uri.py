@@ -34,14 +34,30 @@ class URI(NamedTuple):
         """String representation excluding the JSON pointer."""
         return path.join(self.uri_base, self.uri_name)
 
-    def relative(self, reference: str) -> "URI":
+    def _get_relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root."""
         if not isinstance(reference, str):
             raise TypeError(f"Got invalid value for '$ref': {reference}.")
         if not reference.split("#")[0]:  # Local reference.
-            return URI(self.uri_base, self.uri_name, reference.split("#")[1])
+            reference = reference.split("#")[1] or "/"
+            return URI(self.uri_base, self.uri_name, reference)
         # Remote reference.
         return self.from_string(path.join(self.uri_base, reference))
+
+    def relative(self, reference: str) -> "URI":
+        """Get a new URI relative to the current root.
+
+        :raises ReferenceParseError: if relative reference is equal
+          to the current reference.
+        :return: The URI of the reference relative to the current URI.
+        """
+        relative_uri = self._get_relative(reference)
+        if relative_uri == self:
+            raise ReferenceParseError(
+                f"Reference: '{reference}' from context '{self}' is "
+                "self-referential. Cannot resolve."
+            )
+        return relative_uri
 
     def get(self, *pointer_segments: str) -> "URI":
         """Get a new URI representing a member of the current URI."""

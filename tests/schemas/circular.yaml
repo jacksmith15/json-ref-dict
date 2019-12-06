@@ -1,0 +1,3 @@
+definitions:
+  foo:
+    $ref: '#/'

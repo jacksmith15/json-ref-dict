@@ -9,8 +9,8 @@ schema = RefDict("https://json-schema.org/draft-04/schema#/")
 ```
 
 Nested items containing `"$ref"` will be resolved lazily when accessed,
-meaning the dictionary can be treating as a single coninuous (and
-possibly infinite document).
+meaning the dictionary can be treating as a single, continuous (and
+possibly infinite) document.
 
 Remote references are supported, and will be resolved relative to the current
 document.

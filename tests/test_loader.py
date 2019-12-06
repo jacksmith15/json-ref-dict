@@ -12,7 +12,7 @@ PINNED_FILE_URL = (
 )
 
 
-class TestRefDictFileSystemRefs:
+class TestRefDictIORefs:
     @staticmethod
     @pytest.fixture(
         scope="class",

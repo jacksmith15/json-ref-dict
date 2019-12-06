@@ -1,7 +1,7 @@
 """Declares `RefDict` type, for loading JSONSchema documents with references.
 
 `RefDict` accepts a Base URI, and then lazily loads local or remote
-references when accessed, allowig it to be treated as a normal
+references when accessed, allowing it to be treated as a normal
 dictionary.
 
 If `yaml` is installed, loading of yaml schemas is supported, otherwise

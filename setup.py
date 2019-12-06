@@ -23,10 +23,18 @@ with open(REQUIREMENTS_FILE_PATH, "r") as f:
         if not line.startswith("#") and not line.startswith("--")
     ]
 
+with open("README.md", "r") as readme_file:
+    LONG_DESCRIPTION = readme_file.read()
+
+
 setup(
     name="json-ref-dict",
     version=json_ref_dict.__version__,
-    description="Python dict-like object which abstracts resolution of JSONSchema references",
+    description=(
+        "Python dict-like object which abstracts resolution of "
+        "JSONSchema references"
+    ),
+    log_description=LONG_DESCRIPTION,
     author="Jack Smith",
     classifiers=[
         "Development Status :: 3 - Alpha",

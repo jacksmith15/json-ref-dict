@@ -1,8 +1,9 @@
 from collections import UserDict, UserList
 from typing import Any, Union
 
-from json_ref_dict.uri import URI
+from json_ref_dict.exceptions import DocumentParseError
 from json_ref_dict.ref_pointer import resolve_uri
+from json_ref_dict.uri import URI
 
 
 class RefDict(UserDict):  # pylint: disable=too-many-ancestors

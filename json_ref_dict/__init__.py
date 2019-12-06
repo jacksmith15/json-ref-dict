@@ -17,6 +17,7 @@ from typing import (
     Dict,
     List,
     NamedTuple,
+    NoReturn,
     Optional,
     Tuple,
     TypeVar,
@@ -83,6 +84,14 @@ class URI(NamedTuple):
             uri_base=self.uri_base,
             uri_name=self.uri_name,
             pointer=path.join(self.pointer, *pointer_segments),
+        )
+
+    def back(self) -> "URI":
+        """Pop a segment from the pointer."""
+        segments = self.pointer.split("/")
+        pointer = path.join("/", *segments[:-1])
+        return self.__class__(
+            uri_base=self.uri_base, uri_name=self.uri_name, pointer=pointer
         )
 
     def __repr__(self) -> str:
@@ -210,6 +219,21 @@ class RefPointer(JsonPointer):
 
     get = resolve
 
+    def set(self, doc: Any, value: Any, inplace: bool = True) -> NoReturn:
+        """`RefPointer` is read-only."""
+        raise NotImplementedError("Cannot edit distributed schema.")
+
+    def to_last(
+        self, doc: Any
+    ) -> Tuple[Any, Union[str, int]]:
+        """Resolves pointer until the last step.
+
+        :return: (sub-doc, last-step).
+        """
+        result = RefPointer(self.uri.back()).resolve(doc)
+        part = self.get_part(result, self.parts[-1])
+        return result, part
+
 
 @lru_cache(maxsize=None)
 def resolve_uri(uri: URI) -> T:
@@ -236,6 +260,4 @@ def get_document(base_uri: str):
     try:
         return CONTENT_LOADER(content)
     except Exception as exc:
-        raise ParseError(
-            f"Failed to load uri '{base_uri}'."
-        ) from exc
+        raise ParseError(f"Failed to load uri '{base_uri}'.") from exc

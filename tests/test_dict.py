@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Tuple, Union
 from unittest.mock import patch
 
 from jsonpointer import JsonPointer
@@ -151,7 +151,7 @@ class TestRefPointer:
             (("local_ref",), {"type": "number"}),
             (("backref",), {"type": "null"}),
             (("remote_nested", "foo"), {"type": "array"}),
-        ]
+        ],
     )
     def test_ref_pointer_resolve(
         uri: URI,
@@ -162,3 +162,54 @@ class TestRefPointer:
     ):
         pointer = RefPointer(uri.get("definitions", *path))
         assert getattr(pointer, method)(document) == expected
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        "path,expected",
+        [
+            (("foo",), "/definitions/foo"),
+            (("remote_ref",), "/definitions/remote_ref"),
+            (("local_ref",), "/definitions/local_ref"),
+            (("backref",), "/definitions/backref"),
+            (("remote_nested", "foo"), "/definitions/remote_nested/foo"),
+        ],
+    )
+    def test_re_pointer_path(uri: URI, path: Iterable[str], expected: str):
+        pointer = RefPointer(uri.get("definitions", *path))
+        assert pointer.path == expected
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        "path",
+        [
+            ("foo",),
+            ("remote_ref",),
+            ("local_ref",),
+            ("backref",),
+            ("remote_nested", "foo"),
+        ],
+    )
+    def test_set_fails(uri: URI, document: Dict[str, Any], path: Iterable[str]):
+        pointer = RefPointer(uri.get("definitions", *path))
+        with pytest.raises(NotImplementedError):
+            pointer.set(document, "foo")
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        "path,expected",
+        [
+            (("foo", "type"), ({"type": "string"}, "type")),
+            (("remote_ref", "type"), ({"type": "integer"}, "type")),
+            (("local_ref", "type"), ({"type": "number"}, "type")),
+            (("backref", "type"), ({"type": "null"}, "type")),
+            (("remote_nested", "foo", "type"), ({"type": "array"}, "type")),
+        ],
+    )
+    def test_to_last(
+        uri: URI,
+        document: Dict[str, Any],
+        path: Iterable[str],
+        expected: Tuple[Any, Union[str, int]],
+    ):
+        pointer = RefPointer(uri.get("definitions", *path))
+        assert pointer.to_last(document) == expected

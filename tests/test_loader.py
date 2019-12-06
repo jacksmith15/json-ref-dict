@@ -1,14 +1,37 @@
+from os import getcwd, path
+
 import pytest
 
 from json_ref_dict import RefDict
 from json_ref_dict.exceptions import DocumentParseError
 
 
+PINNED_FILE_URL = (
+    "https://raw.githubusercontent.com/jacksmith15/json-ref-dict/091af2"
+    "c19989a95449df587b62abea89aeb83676/tests/schemas/master.yaml"
+)
+
+
 class TestRefDictFileSystemRefs:
     @staticmethod
-    @pytest.fixture(scope="module")
-    def schema():
-        return RefDict("tests/schemas/master.yaml#/definitions")
+    @pytest.fixture(
+        scope="class",
+        params=[
+            # relative filepath
+            "tests/schemas/master.yaml#/definitions",
+            # absolute filepath
+            path.join(getcwd(), "tests/schemas/master.yaml#/definitions"),
+            # explicit file scheme
+            (
+                "file://"
+                + path.join(getcwd(), "tests/schemas/master.yaml#/definitions")
+            ),
+            # https URI
+            PINNED_FILE_URL + "#/definitions",
+        ],
+    )
+    def schema(request):
+        return RefDict(request.param)
 
     @staticmethod
     def test_schema_loads(schema):

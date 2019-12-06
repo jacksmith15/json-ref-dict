@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.2.0] - 2019-12-06
 ### Fixed
 * Regular expression in release tool.
 
@@ -32,7 +34,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: https://github.com/jacksmith15/json-ref-dict/compare/0.1.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.0..HEAD
+[0.2.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.1.0..0.2.0
 [0.1.0]: http://github.com/jacksmith15/json-ref-dict/compare/initial..0.1.0
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/

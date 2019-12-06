@@ -208,6 +208,8 @@ class RefPointer(JsonPointer):
                 return default
         return doc
 
+    get = resolve
+
 
 @lru_cache(maxsize=None)
 def resolve_uri(uri: URI) -> T:
@@ -216,21 +218,24 @@ def resolve_uri(uri: URI) -> T:
     Loads the document and resolves the pointer, bypsasing refs.
     Utilises `lru_cache` to avoid re-loading multiple documents.
     """
-    document = get_document(uri)
+    try:
+        document = get_document(uri.root)
+    except ParseError:
+        raise ParseError(f"Failed to load base document of {uri}.")
     return RefPointer(uri).resolve(document)
 
 
 @lru_cache(maxsize=None)
-def get_document(uri: URI):
+def get_document(base_uri: str):
     """Load a document based on URI root.
 
     Currently assumes the URI is a filesystem URI.
     """
-    with open(uri.root) as file:
+    with open(base_uri) as file:
         content = file.read()
     try:
         return CONTENT_LOADER(content)
     except Exception as exc:
         raise ParseError(
-            f"Failed to load uri '{uri}', couldn't parse '{uri.root}'"
+            f"Failed to load uri '{base_uri}'."
         ) from exc

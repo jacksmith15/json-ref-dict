@@ -1,9 +1,10 @@
+from typing import Any, Dict, Iterable
 from unittest.mock import patch
 
 from jsonpointer import JsonPointer
 import pytest
 
-from json_ref_dict import resolve_uri, RefDict, URI
+from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
 
 
 TEST_DATA = {
@@ -15,7 +16,7 @@ TEST_DATA = {
             "baz": {"type": "number"},
             "backref": {"$ref": "file2.json#/definitions/nested_back/back"},
             "qux": {"type": "null"},
-            "remote_nested": {"$ref": "file2.json#/definitions/nested_remote"}
+            "remote_nested": {"$ref": "file2.json#/definitions/nested_remote"},
         }
     },
     "base/file2.json": {
@@ -35,8 +36,8 @@ TEST_DATA = {
 }
 
 
-def get_document(uri: URI):
-    return TEST_DATA[uri.root]
+def get_document(base_uri: str):
+    return TEST_DATA[base_uri]
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -47,75 +48,117 @@ def override_loader():
     patcher.stop()
 
 
-def test_get_no_ref():
-    uri = URI.from_string("base/file1.json#/definitions/foo")
-    data = resolve_uri(uri)
-    assert data == {"type": "string"}
+class TestResolveURI:
+    @staticmethod
+    def test_get_no_ref():
+        uri = URI.from_string("base/file1.json#/definitions/foo")
+        data = resolve_uri(uri)
+        assert data == {"type": "string"}
+
+    @staticmethod
+    def test_get_local_ref():
+        local_ref_uri = URI.from_string(
+            "base/file1.json#/definitions/local_ref"
+        )
+        local_ref = resolve_uri(local_ref_uri)
+        assert local_ref == {"type": "number"}
+
+    @staticmethod
+    def test_get_remote_ref():
+        remote_ref_uri = URI.from_string(
+            "base/file1.json#/definitions/remote_ref"
+        )
+        remote_ref = resolve_uri(remote_ref_uri)
+        assert remote_ref == {"type": "integer"}
+
+    @staticmethod
+    def test_get_backref():
+        backref_uri = URI.from_string("base/file1.json#/definitions/backref")
+        backref = resolve_uri(backref_uri)
+        assert backref == {"type": "null"}
+
+    @staticmethod
+    def test_get_nested_remote_ref():
+        nested_remote_uri = URI.from_string(
+            "base/file1.json#/definitions/remote_nested/foo"
+        )
+        nested_remote = resolve_uri(nested_remote_uri)
+        assert nested_remote == {"type": "array"}
 
 
-def test_get_local_ref():
-    local_ref_uri = URI.from_string("base/file1.json#/definitions/local_ref")
-    local_ref = resolve_uri(local_ref_uri)
-    assert local_ref == {"type": "number"}
+class TestRefDict:
+    @staticmethod
+    @pytest.fixture(scope="class")
+    def ref_dict():
+        return RefDict(URI.from_string("base/file1.json#/definitions"))
+
+    @staticmethod
+    def test_load_dict_no_ref(ref_dict: RefDict):
+        assert ref_dict["foo"] == {"type": "string"}
+
+    @staticmethod
+    def test_load_dict_local_ref(ref_dict: RefDict):
+        assert ref_dict["local_ref"] == {"type": "number"}
+
+    @staticmethod
+    def test_load_dict_remote_ref(ref_dict: RefDict):
+        assert ref_dict["remote_ref"] == {"type": "integer"}
+
+    @staticmethod
+    def test_load_dict_backref(ref_dict: RefDict):
+        assert ref_dict["backref"] == {"type": "null"}
+
+    @staticmethod
+    def test_load_dict_remote_nested_ref(ref_dict):
+        assert ref_dict["remote_nested"]["foo"] == {"type": "array"}
+
+    @staticmethod
+    def test_references_propagate_through_arrays():
+        ref_dict = RefDict("base/reflist.json#/definitions")
+        assert ref_dict["foo"]["not"][0] == {"type": "object"}
+
+    @staticmethod
+    def test_direct_reference_retrieval_in_array():
+        assert RefDict("base/reflist.json#/definitions/foo/not/0") == {
+            "type": "object"
+        }
+
+    @staticmethod
+    def test_json_pointer_on_dict():
+        ref_dict = RefDict("base/reflist.json#/")
+        pointer = JsonPointer("/definitions/foo/not/0")
+        assert pointer.resolve(ref_dict) == {"type": "object"}
 
 
-def test_get_remote_ref():
-    remote_ref_uri = URI.from_string("base/file1.json#/definitions/remote_ref")
-    remote_ref = resolve_uri(remote_ref_uri)
-    assert remote_ref == {"type": "integer"}
+class TestRefPointer:
+    @staticmethod
+    @pytest.fixture(scope="class")
+    def uri() -> URI:
+        return URI.from_string("base/file1.json#/")
 
+    @staticmethod
+    @pytest.fixture(scope="class")
+    def document(uri: URI) -> Dict[str, Any]:
+        return get_document(uri.root)
 
-def test_get_backref():
-    backref_uri = URI.from_string("base/file1.json#/definitions/backref")
-    backref = resolve_uri(backref_uri)
-    assert backref == {"type": "null"}
-
-
-@pytest.mark.foo
-def test_get_nested_remote_ref():
-    nested_remote_uri = URI.from_string(
-        "base/file1.json#/definitions/remote_nested/foo"
+    @staticmethod
+    @pytest.mark.parametrize("method", ["resolve", "get"])
+    @pytest.mark.parametrize(
+        "path,expected",
+        [
+            (("foo",), {"type": "string"}),
+            (("remote_ref",), {"type": "integer"}),
+            (("local_ref",), {"type": "number"}),
+            (("backref",), {"type": "null"}),
+            (("remote_nested", "foo"), {"type": "array"}),
+        ]
     )
-    nested_remote = resolve_uri(nested_remote_uri)
-    assert nested_remote == {"type": "array"}
-
-
-@pytest.fixture(scope="module")
-def ref_dict():
-    return RefDict(URI.from_string("base/file1.json#/definitions"))
-
-
-def test_load_dict_no_ref(ref_dict: RefDict):
-    assert ref_dict["foo"] == {"type": "string"}
-
-
-def test_load_dict_local_ref(ref_dict: RefDict):
-    assert ref_dict["local_ref"] == {"type": "number"}
-
-
-def test_load_dict_remote_ref(ref_dict: RefDict):
-    assert ref_dict["remote_ref"] == {"type": "integer"}
-
-
-def test_load_dict_backref(ref_dict: RefDict):
-    assert ref_dict["backref"] == {"type": "null"}
-
-
-def test_load_dict_remote_nested_ref(ref_dict):
-    assert ref_dict["remote_nested"]["foo"] == {"type": "array"}
-
-
-def test_references_propagate_through_arrays():
-    ref_dict = RefDict("base/reflist.json#/definitions")
-    assert ref_dict["foo"]["not"][0] == {"type": "object"}
-
-
-def test_direct_reference_retrieval_in_array():
-    assert RefDict("base/reflist.json#/definitions/foo/not/0") == {
-        "type": "object"
-    }
-
-def test_pointer():
-    ref_dict = RefDict("base/reflist.json#/")
-    pointer = JsonPointer("/definitions/foo/not/0")
-    assert pointer.resolve(ref_dict) == {"type": "object"}
+    def test_ref_pointer_resolve(
+        uri: URI,
+        document: Dict[str, Any],
+        method: str,
+        path: Iterable[str],
+        expected: Any,
+    ):
+        pointer = RefPointer(uri.get("definitions", *path))
+        assert getattr(pointer, method)(document) == expected

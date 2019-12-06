@@ -93,9 +93,7 @@ class RefPointer(JsonPointer):
         """`RefPointer` is read-only."""
         raise NotImplementedError("Cannot edit distributed schema.")
 
-    def to_last(
-        self, doc: Any
-    ) -> Tuple[Any, Union[str, int]]:
+    def to_last(self, doc: Any) -> Tuple[Any, Union[str, int]]:
         """Resolves pointer until the last step.
 
         :return: (sub-doc, last-step).
@@ -125,9 +123,9 @@ def get_document(base_uri: str):
 
     Currently assumes the URI is a filesystem URI.
     """
-    with open(base_uri) as file:
-        content = file.read()
     try:
+        with open(base_uri) as file:
+            content = file.read()
         return CONTENT_LOADER(content)
     except Exception as exc:
         raise DocumentParseError(f"Failed to load uri '{base_uri}'.") from exc

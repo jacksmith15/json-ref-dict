@@ -1,8 +1,5 @@
 from collections import UserDict, UserList
-from typing import (
-    Any,
-    Union,
-)
+from typing import Any, Union
 
 from json_ref_dict.uri import URI
 from json_ref_dict.ref_pointer import resolve_uri
@@ -53,8 +50,6 @@ class RefList(UserList):  # pylint: disable=too-many-ancestors
 
     def __getitem__(self, index: Union[int, slice]):
         """Propagate ref resolution behaviour to nested objects."""
-        if isinstance(index, slice):
-            raise TypeError("JSON pointers do not support slice indexes!")
         item = super().__getitem__(index)
         uri = self.uri.get(str(index))
         return propagate(uri, item)

@@ -5,6 +5,7 @@ from jsonpointer import JsonPointer, JsonPointerException
 import pytest
 
 from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
+from json_ref_dict.ref_dict import RefList
 
 
 TEST_DATA = {
@@ -122,6 +123,32 @@ class TestRefDict:
         assert RefDict("base/reflist.json#/definitions/foo/not/0") == {
             "type": "object"
         }
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        "reference",
+        [
+            "base/reflist.json#/definitions/foo/not",
+            "base/file1.json#/definitions/foo/type",
+            "base/file1.json#/definitions/backref/type",
+        ],
+    )
+    def test_ref_dict_raises_when_target_is_not_object(reference: str):
+        with pytest.raises(TypeError):
+            _ = RefDict(reference)
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        "reference",
+        [
+            "base/reflist.json#/definitions/foo/not/0",
+            "base/file1.json#/definitions/foo",
+            "base/file1.json#/definitions/backref/type",
+        ],
+    )
+    def test_ref_list_raises_when_target_is_not_array(reference: str):
+        with pytest.raises(TypeError):
+            _ = RefList(reference)
 
     @staticmethod
     def test_json_pointer_on_dict():

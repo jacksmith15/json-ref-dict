@@ -22,7 +22,10 @@ class URI(NamedTuple):
         match = re.match(JSON_REF_REGEX, string)
         if not match:
             raise ReferenceParseError(
-                f"Couldn't parse '{string}' as a valid reference."
+                f"Couldn't parse '{string}' as a valid reference. "
+                "References must be of the format "
+                "{base_uri}#{json_pointer}, where 'json_pointer' "
+                "begins with '/'"
             )
         return URI(**match.groupdict())
 
@@ -34,9 +37,7 @@ class URI(NamedTuple):
     def relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root."""
         if not isinstance(reference, str):
-            raise ReferenceParseError(
-                f"Got invalid value for '$ref': {reference}."
-            )
+            raise TypeError(f"Got invalid value for '$ref': {reference}.")
         if not reference.split("#")[0]:  # Local reference.
             return URI(self.uri_base, self.uri_name, reference.split("#")[1])
         # Remote reference.

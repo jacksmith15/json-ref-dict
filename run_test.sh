@@ -15,9 +15,9 @@ header() {
     local width
     header="$1"
     color="$2"
-    
+
     len="${#header}"
-    
+
     width="$(tput cols)"
     let block="($width-$len - 4)/2"
     echo -e "$color"
@@ -81,7 +81,7 @@ EXIT_CODE=0
 
 if [[ -z ${COVERAGE_MIN_PERCENTAGE} ]];
 then
-    COVERAGE_MIN_PERCENTAGE=84
+    COVERAGE_MIN_PERCENTAGE=95
 fi
 
 clean() {
@@ -99,8 +99,8 @@ clean() {
 
 lint() {
     header "Linting" "$blue"
-    PYLINT_CMD="pylint --output-format=colorized" 
-    $PYLINT_CMD --rcfile json_ref_dict/.pylintrc json_ref_dict || EXIT_CODE=1 
+    PYLINT_CMD="pylint --output-format=colorized"
+    $PYLINT_CMD --rcfile json_ref_dict/.pylintrc json_ref_dict || EXIT_CODE=1
     $PYLINT_CMD --rcfile tests/.pylintrc tests || EXIT_CODE=1
 }
 

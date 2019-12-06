@@ -17,6 +17,8 @@ Types of changes are:
 * Project started :)
 * Added `RefDict` class for loading related schemas by URI.
 * Added File-system loading support.
+* Added `RefPointer`. Subclasses `jsonpointer.JsonPointer` and traverses
+  references.
 
 ## [0.0.0]
 Nothing here.

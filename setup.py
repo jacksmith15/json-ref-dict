@@ -35,6 +35,7 @@ setup(
         "JSONSchema references"
     ),
     long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/markdown",
     url="https://github.com/jacksmith15/json-ref-dict",
     author="Jack Smith",
     classifiers=[

@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed `long_description_content_type` in `setup.py`
 
 ## [0.2.0] - 2019-12-06
 ### Fixed

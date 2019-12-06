@@ -7,11 +7,23 @@ dictionary.
 If `yaml` is installed, loading of yaml schemas is supported, otherwise
 standard library `json` is used.
 """
-from collections import UserDict, UserList
+from collections import abc, UserDict, UserList
 from functools import lru_cache, singledispatch
 from os import path
 import re
-from typing import Any, Callable, Dict, List, NamedTuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
+
+from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
 CONTENT_LOADER: Callable[[str], Dict]
 
@@ -58,17 +70,19 @@ class URI(NamedTuple):
 
     def relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root."""
+        if not isinstance(reference, str):
+            raise ParseError(f"Got invalid value for '$ref': {reference}.")
         if not reference.split("#")[0]:  # Local reference.
             return URI(self.uri_base, self.uri_name, reference.split("#")[1])
         # Remote reference.
         return self.from_string(path.join(self.uri_base, reference))
 
-    def get(self, pointer_segment: str) -> "URI":
+    def get(self, *pointer_segments: str) -> "URI":
         """Get a new URI representing a member of the current URI."""
         return self.__class__(
             uri_base=self.uri_base,
             uri_name=self.uri_name,
-            pointer=path.join(self.pointer, pointer_segment),
+            pointer=path.join(self.pointer, *pointer_segments),
         )
 
     def __repr__(self) -> str:
@@ -87,7 +101,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
     def __init__(self, uri: Union[str, URI], *args, **kwargs):
         """On instantiation, retrieve the data from the URI."""
         self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        value = _get_uri(self.uri)
+        value = resolve_uri(self.uri)
         if not isinstance(value, dict):
             raise TypeError(
                 f"The value at '{uri}' is not an object. Got '{value}'."
@@ -112,7 +126,7 @@ class RefList(UserList):  # pylint: disable=too-many-ancestors
     def __init__(self, uri: Union[str, URI], *args, **kwargs):
         """On instantiation, retrieve the data from the URI."""
         self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        value = _get_uri(self.uri)
+        value = resolve_uri(self.uri)
         if not isinstance(value, list):
             raise TypeError(
                 f"The value at '{uri}' is not an array. Got '{value}'."
@@ -139,15 +153,71 @@ def propagate(uri: URI, value: Any):
     return value
 
 
+class RefPointer(JsonPointer):
+    """Subclass of `JsonPointer` which accepts full URI.
+
+    When references are encountered, resolution is deferred to a new
+    `RefPointer` with a new URI context to support reference nesting.
+    """
+
+    def __init__(self, uri: Union[str, URI]):
+        self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
+        super().__init__(self.uri.pointer)
+
+    def resolve_remote(
+        self, doc: Any, parts_idx: int
+    ) -> Tuple[bool, Optional[Any]]:
+        """Defer resolution of references to a new RefPointer.
+
+        :param doc: document element.
+        :param parts_idx: index of the reference part reached.
+        :return: tuple indicating (1) if doc was a ref and (2) what
+            that ref was.
+        """
+        if not (isinstance(doc, abc.Mapping) and "$ref" in doc):
+            return False, None
+        remote_uri = self.uri.relative(doc["$ref"]).get(
+            *self.parts[parts_idx + 1 :]
+        )
+        return True, resolve_uri(remote_uri)
+
+    def resolve(self, doc: Any, default: Any = _nothing) -> Any:
+        """Resolves the pointer against doc and returns the referenced object.
+
+        If any remotes are found, then resolution is deferred to a new
+        pointer instance in that reference scope.
+
+        :param doc: The document in which to resolve the pointer.
+        :param default: The value to return if the pointer fails. If not
+            passed, an exception will be raised.
+        :return: The value of the pointer in this document.
+        :raises JsonPointerException: if `default` is not set and pointer
+            could not be resolved.
+        """
+        for idx, part in enumerate(self.parts):
+            if not part:
+                continue
+            try:
+                doc = self.walk(doc, part)
+                has_remote, remote = self.resolve_remote(doc, idx)
+                if has_remote:
+                    return remote
+            except JsonPointerException:
+                if default is _nothing:
+                    raise
+                return default
+        return doc
+
+
 @lru_cache(maxsize=None)
-def _get_uri(uri: URI) -> T:
+def resolve_uri(uri: URI) -> T:
     """Find the value for a given URI.
 
     Loads the document and resolves the pointer, bypsasing refs.
     Utilises `lru_cache` to avoid re-loading multiple documents.
     """
     document = get_document(uri)
-    return _resolve_in_document(uri, document)
+    return RefPointer(uri).resolve(document)
 
 
 @lru_cache(maxsize=None)
@@ -164,58 +234,3 @@ def get_document(uri: URI):
         raise ParseError(
             f"Failed to load uri '{uri}', couldn't parse '{uri.root}'"
         ) from exc
-
-
-def _get_bypass_ref(uri: URI, data: Union[List, Dict], breadcrumb: str) -> T:
-    """Get a key from a document, resolving refs on the result if present."""
-    output = _get_breadcrumb(data, breadcrumb)
-    if isinstance(output, dict) and "$ref" in output:
-        return _get_uri(uri.relative(output["$ref"]))
-    return output
-
-
-def _resolve_in_document(uri: URI, document: Dict):
-    """Resolve a JSON Pointer in a document.
-
-    Bypasses refs by deferring to `_get_bypass_ref`.
-    :raises KeyError: if the JSON pointer isn't resolvable.
-    :return: the value of the JSON Pointer from the root of a given
-        document.
-    """
-    breadcrumbs = uri.pointer.strip("/").split("/")
-    output = document
-    for idx, breadcrumb in enumerate(breadcrumbs):
-        if not breadcrumb:
-            continue
-        try:
-            output = _get_bypass_ref(uri, output, breadcrumb)
-        except (KeyError, ValueError) as exc:
-            raise KeyError(
-                f"Failed to parse '{uri}'. Couldn't resolve "
-                f"{breadcrumbs[:idx + 1]}"
-            ) from exc
-    return output
-
-
-@singledispatch
-def _get_breadcrumb(data: Any, breadcrumb: str) -> T:
-    """Single dispatch to resolve JSON Pointer fragments."""
-    raise ValueError(f"Cannot retrieve member of non-array/object item {data}.")
-
-
-@_get_breadcrumb.register(dict)
-def _get_breadcrumb_dict(data: Dict, breadcrumb: str) -> T:
-    """If the data is a dict, simply attempt to get the member."""
-    return data[breadcrumb]
-
-
-@_get_breadcrumb.register(list)
-def _get_breadcrumb_list(data: List, breadcrumb: str) -> T:
-    """If the data is an array, ensure the fragment is an int."""
-    try:
-        index = int(breadcrumb)
-    except ValueError as exc:
-        raise ValueError(
-            f"Got string index {breadcrumb} for array element."
-        ) from exc
-    return data[index]

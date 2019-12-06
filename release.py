@@ -161,7 +161,7 @@ def update_versions(current_version: Version, new_version: Version):
             "## [Unreleased]\n",
             "\n",
             f"## [{new_version}] - {today}\n",
-            *takewhile(lambda l: not re.match("^[Unreleased]:.*", l), file),
+            *takewhile(lambda l: not re.match(r"^\[Unreleased\]:.*", l), file),
             repo_compare(old=new_version),
             repo_compare(old=current_version, new=new_version),
             *file,

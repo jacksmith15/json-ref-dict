@@ -94,7 +94,7 @@ clean() {
     rm -rf .mypy_cache || true
     rm -r build || true
     rm -r dist || true
-    rm -r "$(echo -- *.egg-info)" || true
+    rm -r "$(echo *.egg-info)" || true
 }
 
 lint() {

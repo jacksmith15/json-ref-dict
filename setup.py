@@ -27,7 +27,7 @@ setup(
     name="json-ref-dict",
     version=json_ref_dict.__version__,
     description="Python dict-like object which abstracts resolution of JSONSchema references",
-    author=Jack Smith,
+    author="Jack Smith",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

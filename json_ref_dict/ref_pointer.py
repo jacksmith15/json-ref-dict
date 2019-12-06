@@ -92,6 +92,8 @@ def resolve_uri(uri: URI) -> T:
     """
     try:
         document = get_document(uri.root)
-    except DocumentParseError:
-        raise DocumentParseError(f"Failed to load base document of {uri}.")
+    except DocumentParseError as exc:
+        raise DocumentParseError(
+            f"Failed to load base document of {uri}."
+        ) from exc
     return RefPointer(uri).resolve(document)

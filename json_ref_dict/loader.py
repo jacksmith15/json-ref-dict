@@ -43,8 +43,8 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     """
     url = urlparse(base_uri)
     if not url.scheme:
-        prefix = "file://" + ("/" if base_uri.startswith("/") else getcwd())
-        base_uri = path.join(prefix, base_uri)
+        prefix = "" if base_uri.startswith("/") else getcwd()
+        base_uri = "file://" + path.join(prefix, base_uri)
     with urlopen(base_uri) as conn:
         content = CONTENT_LOADER(conn)
     return content

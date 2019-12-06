@@ -1,3 +1,5 @@
+from os import getcwd, path
+
 import pytest
 
 from json_ref_dict import RefDict
@@ -6,9 +8,22 @@ from json_ref_dict.exceptions import DocumentParseError
 
 class TestRefDictFileSystemRefs:
     @staticmethod
-    @pytest.fixture(scope="module")
-    def schema():
-        return RefDict("tests/schemas/master.yaml#/definitions")
+    @pytest.fixture(
+        scope="class",
+        params=[
+            # relative
+            "tests/schemas/master.yaml#/definitions",
+            # absolute
+            path.join(getcwd(), "tests/schemas/master.yaml#/definitions"),
+            # explicit
+            (
+                "file://"
+                + path.join(getcwd(), "tests/schemas/master.yaml#/definitions")
+            ),
+        ],
+    )
+    def schema(request):
+        return RefDict(request.param)
 
     @staticmethod
     def test_schema_loads(schema):

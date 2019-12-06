@@ -244,7 +244,7 @@ def main():
         f"This will checkout master and perform release, continue?"
     ):
         sys.exit(1)
-    # checkout_master()
+    checkout_master()
     header("Determining release type")
     current_version: Version = Version.parse_version(package.__version__)
     next_version, change_content = get_unreleased(current_version)
@@ -255,7 +255,7 @@ def main():
     if not verify_tag():
         sys.exit(1)
     header("Committing and tagging")
-    # tag_release(next_version)
+    tag_release(next_version)
 
 
 if __name__ == "__main__":

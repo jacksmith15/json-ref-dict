@@ -95,5 +95,5 @@ def _materialize_recursive(
         repeats, _next_path(pointer)(seg), data
     )
     if isinstance(item, RefList):
-        return [recur(idx, subitem) for idx, subitem in enumerate(item)]
+        return [recur(str(idx), subitem) for idx, subitem in enumerate(item)]
     return {key: recur(key, value) for key, value in item.items()}

@@ -34,7 +34,8 @@ setup(
         "Python dict-like object which abstracts resolution of "
         "JSONSchema references"
     ),
-    log_description=LONG_DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    url="https://github.com/jacksmith15/json-ref-dict",
     author="Jack Smith",
     classifiers=[
         "Development Status :: 3 - Alpha",

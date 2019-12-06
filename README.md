@@ -71,7 +71,7 @@ schema = materialize(RefDict("https://json-schema.org/draft-04/schema#/"))
 assert isinstance(schema, dict)
 ```
 
-A materialized `RefDict` is just a regular dict, with all references resolved. This is useful if, for example, you want to cache/persist the entire schema. Be aware that if there are cyclical references in the schema, these will be present on the materialized dictionary.
+A materialized `RefDict` is just a regular dict, containing a document with all references resolved. This is useful if, for example, you want to cache/persist the entire schema. Be aware that if there are cyclical references in the schema, these will be present on the materialized dictionary.
 
 # Requirements
 This package is currently tested for Python 3.6.

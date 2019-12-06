@@ -2,7 +2,21 @@
 # JSONSchema Ref Dict
 Python dict-like object which abstracts resolution of JSONSchema references.
 
-Supports file-system reference resolution, but support for other schemes is likely to be added.
+```python
+from json_ref_dict import RefDict
+
+schema = RefDict("https://json-schema.org/draft-04/schema#/")
+```
+
+Nested items containing `"$ref"` will be resolved lazily when accessed,
+meaning the dictionary can be treating as a single coninuous (and
+possibly infinite document).
+
+Remote references are supported, and will be resolved relative to the current
+document.
+
+If no scheme is provided, it is assumed that the document is present on the
+local filesystem (see [Example](#example) below).
 
 If [PyYAML](https://github.com/yaml/pyyaml) is installed, then loading of YAML documents will be supported, otherwise only JSON documents may be loaded.
 
@@ -46,12 +60,6 @@ print(schema["remote_ref"])
 
 print(schema["backref"])
 >>> {'type': 'string'}
-```
-
-If you don't care about lazy-loading, you can just cast the object to a `dict` to resolve all references:
-```python
-print(dict(schema))
->>> {'foo': {'type': 'string'}, 'local_ref': {'type': 'string'}, 'remote_ref': {'type': 'integer'}, 'backref': {'type': 'string'}}
 ```
 
 # Requirements

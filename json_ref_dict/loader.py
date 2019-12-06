@@ -13,10 +13,10 @@ try:
     import yaml
 
     CONTENT_LOADER = yaml.safe_load
-except ImportError:
-    import json
+except ImportError:  # pragma: no cover
+    import json  # pragma: no cover
 
-    CONTENT_LOADER = json.load
+    CONTENT_LOADER = json.load  # pragma: no cover
 
 
 @lru_cache(maxsize=None)

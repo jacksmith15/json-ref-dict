@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Regular expression in release tool.
 
 ## [0.1.0] - 2019-12-06
 ### Added

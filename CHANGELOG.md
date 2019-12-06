@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Regular expression in release tool.
 
 ## [0.1.0] - 2019-12-06
 ### Added
@@ -27,9 +29,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: https://github.com/jacksmith15/json-ref-dict/compare/initial..HEAD
+[Unreleased]: https://github.com/jacksmith15/json-ref-dict/compare/0.1.0..HEAD
+[0.1.0]: http://github.com/jacksmith15/json-ref-dict/compare/initial..0.1.0
 
 [Keep a Changelog]: http://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.1.0..HEAD
-[0.1.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.0.0..0.1.0

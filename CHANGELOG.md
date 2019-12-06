@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.2.1] - 2019-12-06
 ### Fixed
 * Fixed `long_description_content_type` in `setup.py`
 
@@ -36,7 +38,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.1..HEAD
+[0.2.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.0..0.2.1
 [0.2.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.1.0..0.2.0
 [0.1.0]: http://github.com/jacksmith15/json-ref-dict/compare/initial..0.1.0
 

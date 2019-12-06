@@ -1,32 +1,12 @@
 from collections import abc
 from functools import lru_cache
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    NoReturn,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Any, Dict, List, NoReturn, Optional, Tuple, TypeVar, Union
 
 from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
 from json_ref_dict.exceptions import DocumentParseError
+from json_ref_dict.loader import get_document
 from json_ref_dict.uri import URI
-
-CONTENT_LOADER: Callable[[str], Dict]
-
-try:
-    import yaml
-
-    CONTENT_LOADER = yaml.safe_load
-except ImportError:
-    import json
-
-    CONTENT_LOADER = json.loads
 
 
 T = TypeVar("T", List, Dict, int, float, str, bool, None)
@@ -115,17 +95,3 @@ def resolve_uri(uri: URI) -> T:
     except DocumentParseError:
         raise DocumentParseError(f"Failed to load base document of {uri}.")
     return RefPointer(uri).resolve(document)
-
-
-@lru_cache(maxsize=None)
-def get_document(base_uri: str):
-    """Load a document based on URI root.
-
-    Currently assumes the URI is a filesystem URI.
-    """
-    try:
-        with open(base_uri) as file:
-            content = file.read()
-        return CONTENT_LOADER(content)
-    except Exception as exc:
-        raise DocumentParseError(f"Failed to load uri '{base_uri}'.") from exc

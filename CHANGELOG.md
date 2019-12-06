@@ -19,6 +19,8 @@ Types of changes are:
 * Added File-system loading support.
 * Added `RefPointer`. Subclasses `jsonpointer.JsonPointer` and traverses
   references.
+* Added general document loading by URI (deferring to
+  `urllib.request.urlopen`).
 
 ## [0.0.0]
 Nothing here.

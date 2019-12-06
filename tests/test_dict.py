@@ -42,7 +42,7 @@ def get_document(base_uri: str):
 
 @pytest.fixture(scope="module", autouse=True)
 def override_loader():
-    patcher = patch("json_ref_dict.get_document", get_document)
+    patcher = patch("json_ref_dict.ref_pointer.get_document", get_document)
     mock_loader = patcher.start()
     yield mock_loader
     patcher.stop()

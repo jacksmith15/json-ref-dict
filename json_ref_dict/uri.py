@@ -39,7 +39,8 @@ class URI(NamedTuple):
         if not isinstance(reference, str):
             raise TypeError(f"Got invalid value for '$ref': {reference}.")
         if not reference.split("#")[0]:  # Local reference.
-            return URI(self.uri_base, self.uri_name, reference.split("#")[1])
+            reference = reference.split("#")[1] or "/"
+            return URI(self.uri_base, self.uri_name, reference)
         # Remote reference.
         return self.from_string(path.join(self.uri_base, reference))
 

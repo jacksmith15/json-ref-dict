@@ -21,7 +21,12 @@ class RefPointer(JsonPointer):
 
     def __init__(self, uri: Union[str, URI]):
         self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        super().__init__(self.uri.pointer)
+        try:
+            super().__init__(self.uri.pointer)
+        except JsonPointerException:
+            import ipdb
+
+            ipdb.set_trace()
 
     def resolve_remote(
         self, doc: Any, parts_idx: int

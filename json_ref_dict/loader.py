@@ -21,10 +21,7 @@ except ImportError:  # pragma: no cover
 
 @lru_cache(maxsize=None)
 def get_document(base_uri: str):
-    """Load a document based on URI root.
-
-    Currently assumes the URI is a filesystem URI.
-    """
+    """Load a document based on URI root."""
     try:
         return _read_document_content(base_uri)
     except Exception as exc:

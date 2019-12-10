@@ -5,7 +5,7 @@ Python dict-like object which abstracts resolution of JSONSchema references.
 ```python
 from json_ref_dict import RefDict
 
-schema = RefDict("https://json-schema.org/draft-04/schema#/")
+schema = RefDict("https://json-schema.org/draft-07/schema#/")
 ```
 
 Nested items containing `"$ref"` will be resolved lazily when accessed,

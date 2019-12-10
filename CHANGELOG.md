@@ -18,6 +18,10 @@ Types of changes are:
     - `context_labeller` - factory for generating annotation on
       objects in the document from their source URI.
 
+### Fixed
+* Allow `'$ref'` key to be passed as a non-reference if not a
+  string.
+
 ## [0.3.0] - 2019-12-10
 ### Added
 * Three new optional parameters to `materialize`:

@@ -33,7 +33,9 @@ class RefPointer(JsonPointer):
         :return: tuple indicating (1) if doc was a ref and (2) what
             that ref was.
         """
-        if not (isinstance(doc, abc.Mapping) and "$ref" in doc):
+        if not (
+            isinstance(doc, abc.Mapping) and isinstance(doc.get("$ref"), str)
+        ):
             return False, None
         remote_uri = self.uri.relative(doc["$ref"]).get(
             *self.parts[parts_idx + 1 :]

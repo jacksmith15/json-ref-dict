@@ -13,6 +13,13 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Added
+* Three new optional parameters to `materialize`:
+    - `include_keys` - set of keys to include in the materialized
+      document.
+    - `exclude_keys` - set of keys to exclude from the materialized
+      document.
+    - `value_map` - operation to apply to items of the document.
 
 ## [0.2.1] - 2019-12-06
 ### Fixed

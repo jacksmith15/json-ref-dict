@@ -34,6 +34,7 @@ TEST_DATA = {
             "baz": {"type": "object"},
         }
     },
+    "base/nonref.json": {"definitions": {"$ref": {"type": "string"}}},
 }
 
 
@@ -86,6 +87,12 @@ class TestResolveURI:
         nested_remote = resolve_uri(nested_remote_uri)
         assert nested_remote == {"type": "array"}
 
+    @staticmethod
+    def test_get_non_reference():
+        non_ref_uri = URI.from_string("base/nonref.json#/definitions")
+        non_ref = resolve_uri(non_ref_uri)
+        assert non_ref["$ref"] == {"type": "string"}
+
 
 class TestRefDict:
     @staticmethod
@@ -122,6 +129,12 @@ class TestRefDict:
     def test_direct_reference_retrieval_in_array():
         assert RefDict("base/reflist.json#/definitions/foo/not/0") == {
             "type": "object"
+        }
+
+    @staticmethod
+    def test_get_non_ref_ref_key():
+        assert RefDict("base/nonref.json#/definitions")["$ref"] == {
+            "type": "string"
         }
 
     @staticmethod

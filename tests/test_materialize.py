@@ -122,3 +122,11 @@ def test_materialize_uri_label():
             },
         },
     }
+
+
+def test_materialize_name_label_circular():
+    ref_dict = RefDict("tests/schemas/circular.yaml#/")
+    dictionary = materialize(ref_dict, context_labeller=name_label)
+    assert isinstance(dictionary, dict)
+    assert dictionary["definitions"]["title"] == "definitions"
+    assert dictionary["definitions"]["foo"]["title"] == "#"

@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.4.0] - 2019-12-10
 ### Added
 * New optional parameter to `materialize`:
     - `context_labeller` - factory for generating annotation on
@@ -55,7 +57,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.3.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.0..HEAD
+[0.4.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.3.0..0.4.0
 [0.3.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.1..0.3.0
 [0.2.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.0..0.2.1
 [0.2.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.1.0..0.2.0

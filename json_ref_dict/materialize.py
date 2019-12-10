@@ -8,6 +8,7 @@ from typing import (
     NamedTuple,
     Optional,
     Set,
+    Tuple,
     TypeVar,
     Union,
 )
@@ -53,9 +54,12 @@ class _RepeatCache(NamedTuple):
 
 
 class MaterializeConf(NamedTuple):
+    """Config class for materializing schemas."""
+
     value_map: Callable[[Any], Any] = identity
     include_keys: Optional[Set[str]] = None
     exclude_keys: Optional[Set[str]] = None
+    context_labeller: Optional[Callable[[str], Tuple[str, Any]]] = None
 
     def match_key(self, key: str) -> bool:
         if self.include_keys and key not in (self.include_keys or set()):
@@ -64,12 +68,22 @@ class MaterializeConf(NamedTuple):
             return False
         return True
 
+    def label(self, item: RefDict) -> Dict[str, Any]:
+        if callable(self.context_labeller):
+            return dict(
+                # False positive.
+                # pylint: disable=not-callable
+                [self.context_labeller(str(item.uri))]
+            )
+        return {}
+
 
 def materialize(
     item: RefContainer,
     include_keys: Iterable[str] = None,
     exclude_keys: Iterable[str] = None,
     value_map: Callable[[Any], Any] = identity,
+    context_labeller: Callable[[str], Tuple[str, Any]] = None,
 ) -> Union[List, Dict]:
     """Convert a `RefDict` or `RefList` to a regular `dict` or `list`.
 
@@ -89,6 +103,8 @@ def materialize(
         If provided, these keys will not be returned.
     :param value_map: Optionally specify a transformation to apply to
         non-dict/list values of the data documentation.
+    :param context_labeller: Optionally specify a callable to annotate
+        schema document from the source URI of its location.
     :return: Standard `dict` or `list` with all references resolved
         eagerly.
     """
@@ -96,6 +112,7 @@ def materialize(
         include_keys=set(include_keys) if include_keys else None,
         exclude_keys=set(exclude_keys or tuple()),
         value_map=value_map,
+        context_labeller=context_labeller,
     )
     repeats: Dict[URI, _RepeatCache] = {}
     materialized = _materialize_recursive(conf, repeats, "/", item)
@@ -146,7 +163,10 @@ def _materialize_recursive(
     if isinstance(item, RefList):
         return [recur(str(idx), subitem) for idx, subitem in enumerate(item)]
     return {
-        key: recur(key, value)
-        for key, value in item.items()
-        if conf.match_key(key)
+        **conf.label(item),
+        **{
+            key: recur(key, value)
+            for key, value in item.items()
+            if conf.match_key(key)
+        },
     }

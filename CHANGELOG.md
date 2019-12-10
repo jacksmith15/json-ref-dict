@@ -13,6 +13,10 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Added
+* New optional parameter to `materialize`:
+    - `context_labeller` - factory for generating annotation on
+      objects in the document from their source URI.
 
 ## [0.3.0] - 2019-12-10
 ### Added

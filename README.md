@@ -73,6 +73,12 @@ assert isinstance(schema, dict)
 
 A materialized `RefDict` is just a regular dict, containing a document with all references resolved. This is useful if, for example, you want to cache/persist the entire schema. Be aware that if there are cyclical references in the schema, these will be present on the materialized dictionary.
 
+The `materialize` helper also supports some basic transformation options, as performing global transformations on infinite documents is non-trivial:
+
+- `include_keys` - an iterable of keys to include in the materialized document.
+- `exclude_keys` - an iterable of keys to exclude from the materialized document.
+- `value_map` - an operation to apply to the values of the document (not lists or dictionaries).
+
 # Requirements
 This package is currently tested for Python 3.6.
 

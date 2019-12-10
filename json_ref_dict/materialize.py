@@ -1,10 +1,24 @@
 from os import path
-from typing import Any, Callable, Dict, List, NamedTuple, Set, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    TypeVar,
+    Union,
+)
 
 from jsonpointer import JsonPointer
 
 from json_ref_dict.uri import URI
 from json_ref_dict.ref_dict import RefDict, RefList
+
+
+identity: Callable[[Any], Any] = lambda x: x
 
 
 RefContainer = TypeVar("RefContainer", RefDict, RefList)
@@ -38,7 +52,25 @@ class _RepeatCache(NamedTuple):
     repeats: Set[JsonPointer]
 
 
-def materialize(item: RefContainer) -> Union[List, Dict]:
+class MaterializeConf(NamedTuple):
+    value_map: Callable[[Any], Any] = identity
+    include_keys: Optional[Set[str]] = None
+    exclude_keys: Optional[Set[str]] = None
+
+    def match_key(self, key: str) -> bool:
+        if self.include_keys and key not in (self.include_keys or set()):
+            return False
+        if self.exclude_keys and key in (self.exclude_keys or set()):
+            return False
+        return True
+
+
+def materialize(
+    item: RefContainer,
+    include_keys: Iterable[str] = None,
+    exclude_keys: Iterable[str] = None,
+    value_map: Callable[[Any], Any] = identity,
+) -> Union[List, Dict]:
     """Convert a `RefDict` or `RefList` to a regular `dict` or `list`.
 
     Recursively resolves at least once for each URI, and then assigns
@@ -51,11 +83,22 @@ def materialize(item: RefContainer) -> Union[List, Dict]:
     the background to lazily resolve references.
 
     :param item: The `RefDict` or `RefContainer` to materialize.
+    :param include_keys: Optionally specify the set of keys to keep.
+        If provided, keys not present will not be returned.
+    :param exclude_keys: Optionally specify a set of keys to exclude.
+        If provided, these keys will not be returned.
+    :param value_map: Optionally specify a transformation to apply to
+        non-dict/list values of the data documentation.
     :return: Standard `dict` or `list` with all references resolved
         eagerly.
     """
+    conf = MaterializeConf(
+        include_keys=set(include_keys) if include_keys else None,
+        exclude_keys=set(exclude_keys or tuple()),
+        value_map=value_map,
+    )
     repeats: Dict[URI, _RepeatCache] = {}
-    materialized = _materialize_recursive(repeats, "/", item)
+    materialized = _materialize_recursive(conf, repeats, "/", item)
     for duplicate in repeats.values():
         if duplicate.source.path == "/":
             value = materialized
@@ -67,13 +110,19 @@ def materialize(item: RefContainer) -> Union[List, Dict]:
 
 
 def _materialize_recursive(
-    repeats: Dict[URI, _RepeatCache], pointer: str, item: Any
+    conf: MaterializeConf,
+    repeats: Dict[URI, _RepeatCache],
+    pointer: str,
+    item: Any,
 ) -> Any:
     """Recursive function for materializing RefDict/RefList objects.
 
     Keeps track of previously seen items, and stores a reference on
     repeats. Cyclical references are avoided this way, and must be
     added in afterwards (see `materialize`).
+
+    :param conf: `MaterializeConf` object specifying any transformations
+        to perform.
     :param repeats: Shared mutable dictionary for keeping track of
         items which appear multiple times (sometimes in the same path).
     :param pointer: Pointer of the current item relative to the first
@@ -84,7 +133,7 @@ def _materialize_recursive(
     """
     # End-cases
     if not isinstance(item, (RefDict, RefList)):
-        return item
+        return conf.value_map(item)
     if item.uri in repeats:
         repeats[item.uri][1].add(JsonPointer(pointer))
         return None
@@ -92,8 +141,12 @@ def _materialize_recursive(
     # contained items.
     repeats[item.uri] = _RepeatCache(source=JsonPointer(pointer), repeats=set())
     recur = lambda seg, data: _materialize_recursive(
-        repeats, _next_path(pointer)(seg), data
+        conf, repeats, _next_path(pointer)(seg), data
     )
     if isinstance(item, RefList):
         return [recur(str(idx), subitem) for idx, subitem in enumerate(item)]
-    return {key: recur(key, value) for key, value in item.items()}
+    return {
+        key: recur(key, value)
+        for key, value in item.items()
+        if conf.match_key(key)
+    }

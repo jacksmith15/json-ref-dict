@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.4.2] - 2020-03-08
 ### Fixed
 * Fixed bug when parsing JSON containing tabs with `pyyaml`
   installed.
@@ -67,7 +69,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.1..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.2..HEAD
+[0.4.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.1..0.4.2
 [0.4.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.0..0.4.1
 [0.4.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.3.0..0.4.0
 [0.3.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.1..0.3.0

@@ -13,6 +13,9 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed bug when parsing JSON containing tabs with `pyyaml`
+  installed.
 
 ## [0.4.1] - 2020-03-08
 ### Fixed

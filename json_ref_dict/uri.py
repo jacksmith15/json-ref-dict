@@ -19,6 +19,10 @@ class URI(NamedTuple):
     @classmethod
     def from_string(cls, string: str) -> "URI":
         """Contruct from string."""
+        if "#" not in string:
+            string += "#/"
+        if string.endswith("#"):
+            string += "/"
         match = re.match(JSON_REF_REGEX, string)
         if not match:
             raise ReferenceParseError(
@@ -32,7 +36,7 @@ class URI(NamedTuple):
     @property
     def root(self):
         """String representation excluding the JSON pointer."""
-        return path.join(self.uri_base, self.uri_name)
+        return path.join(*filter(None, [self.uri_base, self.uri_name]))
 
     def _get_relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root."""
@@ -42,7 +46,9 @@ class URI(NamedTuple):
             reference = reference.split("#")[1] or "/"
             return URI(self.uri_base, self.uri_name, reference)
         # Remote reference.
-        return self.from_string(path.join(self.uri_base, reference))
+        return self.from_string(
+            path.join(*filter(None, [self.uri_base, reference]))
+        )
 
     def relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root.
@@ -77,4 +83,4 @@ class URI(NamedTuple):
 
     def __repr__(self) -> str:
         """String representation of the URI."""
-        return path.join(self.uri_base, self.uri_name) + f"#{self.pointer}"
+        return self.root + f"#{self.pointer}"

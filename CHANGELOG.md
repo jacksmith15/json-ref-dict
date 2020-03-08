@@ -13,6 +13,11 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed issue where pure address references with no pointers
+  are rejected.
+* Fixed issue with relative remote references independent of a
+  base absolute URI.
 
 ## [0.4.0] - 2019-12-10
 ### Added

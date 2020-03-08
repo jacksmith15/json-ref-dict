@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.4.1] - 2020-03-08
 ### Fixed
 * Fixed issue where pure address references with no pointers
   are rejected.
@@ -62,7 +64,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.1..HEAD
+[0.4.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.0..0.4.1
 [0.4.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.3.0..0.4.0
 [0.3.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.1..0.3.0
 [0.2.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.2.0..0.2.1

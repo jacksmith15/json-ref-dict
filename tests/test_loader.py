@@ -70,6 +70,15 @@ class TestRefDictIORefs:
         with pytest.raises(DocumentParseError):
             _ = RefDict("tests/schemas/nonexistent.yaml#/definitions")
 
+    @staticmethod
+    def test_loading_a_json_file_with_tabs_falls_back_to_json_loader():
+        """YAML is _mostly_ compatible with JSON.
+
+        However, JSON allows tabs between tokens, whilst YAML does not.
+        """
+        value = RefDict("tests/schemas/with-tabs.json")
+        assert dict(value) == {"some": {"json": ["with", "tabs"]}}
+
 
 def test_immediately_circular_reference_fails():
     with pytest.raises(ReferenceParseError):

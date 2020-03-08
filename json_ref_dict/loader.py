@@ -1,4 +1,5 @@
 from functools import lru_cache
+import json
 from os import getcwd, path
 from typing import Any, Callable, Dict, IO
 from urllib.parse import urlparse
@@ -14,8 +15,6 @@ try:
 
     CONTENT_LOADER = yaml.safe_load
 except ImportError:  # pragma: no cover
-    import json  # pragma: no cover
-
     CONTENT_LOADER = json.load  # pragma: no cover
 
 
@@ -42,6 +41,10 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     if not url.scheme:
         prefix = "" if base_uri.startswith("/") else getcwd()
         base_uri = "file://" + path.join(prefix, base_uri)
+    if base_uri.endswith(".json"):
+        loader: Callable = json.load
+    else:
+        loader = CONTENT_LOADER
     with urlopen(base_uri) as conn:
-        content = CONTENT_LOADER(conn)
+        content = loader(conn)
     return content

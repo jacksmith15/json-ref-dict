@@ -16,7 +16,8 @@ Types of changes are:
 
 ## [0.4.3] - 2020-03-19
 ### Fixed
-* Fixed bug where absolute references are treated as relative.
+* Fixed bug where absolute references are treated as relative
+  both within `RefDict` and `RefPointer`.
 
 ## [0.4.2] - 2020-03-08
 ### Fixed

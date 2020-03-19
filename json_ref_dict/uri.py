@@ -1,7 +1,7 @@
 from os import path
 import re
 from typing import NamedTuple
-
+from urllib.parse import urlparse
 
 from json_ref_dict.exceptions import ReferenceParseError
 
@@ -57,7 +57,10 @@ class URI(NamedTuple):
           to the current reference.
         :return: The URI of the reference relative to the current URI.
         """
-        relative_uri = self._get_relative(reference)
+        if is_absolute(reference):
+            relative_uri = URI.from_string(reference)
+        else:
+            relative_uri = self._get_relative(reference)
         if relative_uri == self:
             raise ReferenceParseError(
                 f"Reference: '{reference}' from context '{self}' is "
@@ -84,3 +87,11 @@ class URI(NamedTuple):
     def __repr__(self) -> str:
         """String representation of the URI."""
         return self.root + f"#{self.pointer}"
+
+
+def is_absolute(ref: str) -> bool:
+    """Check if URI is absolute based on scheme."""
+    parsed = urlparse(ref)
+    if parsed.scheme:
+        return True
+    return False

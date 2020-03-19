@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed bug where absolute references are treated as relative.
 
 ## [0.4.2] - 2020-03-08
 ### Fixed

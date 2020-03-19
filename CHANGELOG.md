@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.4.3] - 2020-03-19
 ### Fixed
 * Fixed bug where absolute references are treated as relative.
 
@@ -71,7 +73,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.2..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.3..HEAD
+[0.4.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.2..0.4.3
 [0.4.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.1..0.4.2
 [0.4.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.0..0.4.1
 [0.4.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.3.0..0.4.0

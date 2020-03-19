@@ -13,6 +13,9 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed bug where absolute references are treated as relative
+  within `RefPointer`
 
 ## [0.4.3] - 2020-03-19
 ### Fixed

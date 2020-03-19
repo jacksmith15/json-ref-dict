@@ -1,6 +1,5 @@
 from collections import UserDict, UserList
 from typing import Any, Union
-from urllib.parse import urlparse
 
 from json_ref_dict.ref_pointer import resolve_uri
 from json_ref_dict.uri import URI
@@ -60,19 +59,8 @@ def propagate(uri: URI, value: Any):
     """Ref resolution and propagation of behaviours on __getitem__."""
     if isinstance(value, dict):
         if "$ref" in value and isinstance(value["$ref"], str):
-            ref = value["$ref"]
-            if is_absolute(ref):
-                return RefDict(ref)
-            return RefDict(uri.relative(ref))
+            return RefDict(uri.relative(value["$ref"]))
         return RefDict(uri)
     if isinstance(value, list):
         return RefList(uri)
     return value
-
-
-def is_absolute(ref: str) -> bool:
-    """Check if URI is absolute based on scheme."""
-    parsed = urlparse(ref)
-    if parsed.scheme:
-        return True
-    return False

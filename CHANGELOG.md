@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.5.0] - 2020-03-20
 ### Added
 * References via keys containing / and ~ are now supported.
 
@@ -85,7 +87,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.4..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.0..HEAD
+[0.5.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.4..0.5.0
 [0.4.4]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.3..0.4.4
 [0.4.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.2..0.4.3
 [0.4.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.1..0.4.2

@@ -13,6 +13,9 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Changed
+* Add more intelligent content negotiation to loader, which now
+  detects mimetypes from header if present.
 
 ## [0.4.4] - 2020-03-19
 ### Fixed

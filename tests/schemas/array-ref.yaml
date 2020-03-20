@@ -5,3 +5,5 @@ definitions:
     - type: 'null'
   bar:
     type: string
+  baz:
+    $ref: '#/definitions/foo/oneOf'

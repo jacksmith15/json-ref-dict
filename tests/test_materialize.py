@@ -26,6 +26,7 @@ def test_materialize_array():
         "definitions": {
             "foo": {"oneOf": [{"type": "string"}, {"type": "null"}]},
             "bar": {"type": "string"},
+            "baz": [{"type": "string"}, {"type": "null"}],
         }
     }
 

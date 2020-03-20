@@ -12,4 +12,5 @@ from json_ref_dict import materialize, RefDict
     ],
 )
 def test_external_document_loads_correctly(uri: str):
-    assert materialize(RefDict(uri))
+    dictionary = materialize(RefDict(uri))
+    assert dictionary

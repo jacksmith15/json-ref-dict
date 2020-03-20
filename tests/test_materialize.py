@@ -130,3 +130,15 @@ def test_materialize_name_label_circular():
     assert isinstance(dictionary, dict)
     assert dictionary["definitions"]["title"] == "definitions"
     assert dictionary["definitions"]["foo"]["title"] == "#"
+
+
+def test_materialize_slash_key():
+    ref_dict = RefDict("tests/schemas/slash-key.yaml#/")
+    dictionary = materialize(ref_dict)
+    assert isinstance(dictionary, dict)
+    assert dictionary == {
+        "definitions": {
+            "bar/baz": {"type": "integer"},
+            "slash_key": {"type": "integer"},
+        }
+    }

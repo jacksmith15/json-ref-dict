@@ -95,3 +95,12 @@ def is_absolute(ref: str) -> bool:
     if parsed.scheme:
         return True
     return False
+
+
+def parse_segment(segment: str) -> str:
+    """Parse a pointer segment.
+
+    Individual segments need to replace special chars, as per RFC-6901:
+    https://tools.ietf.org/html/rfc6901
+    """
+    return segment.replace("~", "~0").replace("/", "~1")

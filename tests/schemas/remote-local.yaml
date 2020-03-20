@@ -1,0 +1,5 @@
+definitions:
+  foo:
+    $ref: 'other.yaml#/definitions/remote_local'
+  bar:
+  - $ref: 'other.yaml#/definitions/remote_local'

@@ -14,7 +14,6 @@ def test_materialize_document():
             "local_ref": {"type": "string"},
             "remote_ref": {"type": "integer"},
             "backref": {"type": "string"},
-            "remote_local": [{"type": "integer"}],
         }
     }
 
@@ -75,7 +74,6 @@ def test_materialize_document_value_map():
             "local_ref": {"type": 6},
             "remote_ref": {"type": 7},
             "backref": {"type": 6},
-            "remote_local": [{"type": 7}],
         }
     }
 
@@ -95,7 +93,6 @@ def test_materialize_name_label():
             "local_ref": {"type": "string", "title": "foo"},
             "remote_ref": {"type": "integer", "title": "bar"},
             "backref": {"type": "string", "title": "baz"},
-            "remote_local": [{"type": "integer", "title": "remote_local"}],
         },
         "title": "#",
     }
@@ -125,12 +122,6 @@ def test_materialize_uri_label():
                 "type": "string",
                 "uri": "tests/schemas/other.yaml#/definitions/baz",
             },
-            "remote_local": [
-                {
-                    "type": "integer",
-                    "uri": "tests/schemas/other.yaml#/definitions/remote_local",
-                }
-            ],
         },
     }
 
@@ -151,5 +142,17 @@ def test_materialize_slash_key():
         "definitions": {
             "bar/baz": {"type": "integer"},
             "slash_key": {"type": "integer"},
+        }
+    }
+
+
+def test_materialize_remote_local_reference():
+    ref_dict = RefDict("tests/schemas/remote-local.yaml#/")
+    dictionary = materialize(ref_dict)
+    assert isinstance(dictionary, dict)
+    assert dictionary == {
+        "definitions": {
+            "foo": {"type": "integer"},
+            "bar": [{"type": "integer"}],
         }
     }

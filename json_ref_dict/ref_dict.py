@@ -59,6 +59,13 @@ def propagate(uri: URI, value: Any):
     """Ref resolution and propagation of behaviours on __getitem__."""
     if isinstance(value, dict):
         if "$ref" in value and isinstance(value["$ref"], str):
+            if (
+                str(uri.relative(value["$ref"]))
+                == "http://json.schemastore.org/swagger-2.0#/definitions/positiveInteger"
+            ):
+                import ipdb
+
+                ipdb.set_trace()
             return RefDict(uri.relative(value["$ref"]))
         return RefDict(uri)
     if isinstance(value, list):

@@ -13,6 +13,9 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Added
+* References via keys containing / and ~ are now supported.
+
 ### Changed
 * Add more intelligent content negotiation to loader, which now
   detects mimetypes from header if present.

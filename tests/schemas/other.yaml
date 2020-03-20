@@ -3,3 +3,5 @@ definitions:
     type: integer
   baz:
     $ref: 'master.yaml#/definitions/foo'
+  remote_local:
+    $ref: '#/definitions/bar'

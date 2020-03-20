@@ -7,3 +7,5 @@ definitions:
     $ref: 'other.yaml#/definitions/bar'
   backref:
     $ref: 'other.yaml#/definitions/baz'
+  remote_local:
+  - $ref: 'other.yaml#/definitions/remote_local'

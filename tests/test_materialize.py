@@ -14,6 +14,7 @@ def test_materialize_document():
             "local_ref": {"type": "string"},
             "remote_ref": {"type": "integer"},
             "backref": {"type": "string"},
+            "remote_local": [{"type": "integer"}],
         }
     }
 
@@ -42,7 +43,9 @@ def test_materialize_circular_ref():
 
 def test_materialize_document_exclude_keys():
     ref_dict = RefDict("tests/schemas/master.yaml#/")
-    dictionary = materialize(ref_dict, exclude_keys={"remote_ref"})
+    dictionary = materialize(
+        ref_dict, exclude_keys={"remote_ref", "remote_local"}
+    )
     assert isinstance(dictionary, dict)
     assert dictionary == {
         "definitions": {
@@ -72,6 +75,7 @@ def test_materialize_document_value_map():
             "local_ref": {"type": 6},
             "remote_ref": {"type": 7},
             "backref": {"type": 6},
+            "remote_local": [{"type": 7}],
         }
     }
 
@@ -91,6 +95,7 @@ def test_materialize_name_label():
             "local_ref": {"type": "string", "title": "foo"},
             "remote_ref": {"type": "integer", "title": "bar"},
             "backref": {"type": "string", "title": "baz"},
+            "remote_local": [{"type": "integer", "title": "remote_local"}],
         },
         "title": "#",
     }
@@ -120,6 +125,12 @@ def test_materialize_uri_label():
                 "type": "string",
                 "uri": "tests/schemas/other.yaml#/definitions/baz",
             },
+            "remote_local": [
+                {
+                    "type": "integer",
+                    "uri": "tests/schemas/other.yaml#/definitions/remote_local",
+                }
+            ],
         },
     }
 

@@ -2,7 +2,7 @@ from collections import UserDict, UserList
 from typing import Any, Union
 
 from json_ref_dict.ref_pointer import resolve_uri
-from json_ref_dict.uri import URI
+from json_ref_dict.uri import parse_segment, URI
 
 
 class RefDict(UserDict):  # pylint: disable=too-many-ancestors
@@ -26,7 +26,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
     def __getitem__(self, key: str):
         """Propagate ref resolution behaviour to nested objects."""
         item = super().__getitem__(key)
-        uri = self.uri.get(key)
+        uri = self.uri.get(parse_segment(key))
         return propagate(uri, item)
 
 

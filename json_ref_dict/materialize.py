@@ -15,7 +15,7 @@ from typing import (
 
 from jsonpointer import JsonPointer
 
-from json_ref_dict.uri import URI
+from json_ref_dict.uri import parse_segment, URI
 from json_ref_dict.ref_dict import RefDict, RefList
 
 
@@ -158,7 +158,7 @@ def _materialize_recursive(
     # contained items.
     repeats[item.uri] = _RepeatCache(source=JsonPointer(pointer), repeats=set())
     recur = lambda seg, data: _materialize_recursive(
-        conf, repeats, _next_path(pointer)(seg), data
+        conf, repeats, _next_path(pointer)(parse_segment(seg)), data
     )
     if isinstance(item, RefList):
         return [recur(str(idx), subitem) for idx, subitem in enumerate(item)]

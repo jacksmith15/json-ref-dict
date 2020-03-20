@@ -1,0 +1,5 @@
+definitions:
+  bar/baz:
+    type: integer
+  slash_key:
+    $ref: '#/definitions/bar~1baz'

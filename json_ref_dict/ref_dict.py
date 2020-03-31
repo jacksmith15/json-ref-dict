@@ -29,6 +29,23 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
         uri = self.uri.get(parse_segment(key))
         return propagate(uri, item)
 
+    @staticmethod
+    def from_uri(
+        uri: Union[str, URI]
+    ) -> Union["RefDict", "RefList", None, bool, str, int, float]:
+        """Convert URI to corresponding data type.
+
+        Looks ahead at the raw value, and then returns a RefDict, RefList, or
+        other value.
+        """
+        uri = URI.from_string(uri) if isinstance(uri, str) else uri
+        value = resolve_uri(uri)
+        if isinstance(value, dict):
+            return RefDict(uri)
+        if isinstance(value, list):
+            return RefList(uri)
+        return value
+
 
 class RefList(UserList):  # pylint: disable=too-many-ancestors
     """List for abstracting ref resolution in JSONSchemas.
@@ -59,21 +76,7 @@ def propagate(uri: URI, value: Any):
     """Ref resolution and propagation of behaviours on __getitem__."""
     if isinstance(value, dict):
         if "$ref" in value and isinstance(value["$ref"], str):
-            return _from_uri(uri.relative(value["$ref"]))
-        return RefDict(uri)
-    if isinstance(value, list):
-        return RefList(uri)
-    return value
-
-
-def _from_uri(uri: URI):
-    """Convert URI to corresponding data type.
-
-    Looks ahead at the raw value, and then returns a RefDict, RefList, or
-    other value.
-    """
-    value = resolve_uri(uri)
-    if isinstance(value, dict):
+            return RefDict.from_uri(uri.relative(value["$ref"]))
         return RefDict(uri)
     if isinstance(value, list):
         return RefList(uri)

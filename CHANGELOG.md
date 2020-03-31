@@ -13,6 +13,10 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* References to lists and primitive data types now works
+  when traversing `RefDict` and `RefList` objects.
+* Spaces and newlines now allowed in JSON keys.
 
 ## [0.5.0] - 2020-03-20
 ### Added

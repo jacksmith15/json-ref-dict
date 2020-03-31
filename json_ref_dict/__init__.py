@@ -14,4 +14,4 @@ from json_ref_dict.ref_dict import RefDict
 from json_ref_dict.uri import URI
 
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"

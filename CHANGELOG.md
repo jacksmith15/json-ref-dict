@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.5.1] - 2020-03-31
 ### Fixed
 * References to lists and primitive data types now works
   when traversing `RefDict` and `RefList` objects.
@@ -91,7 +93,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.1..HEAD
+[0.5.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.0..0.5.1
 [0.5.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.4..0.5.0
 [0.4.4]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.3..0.4.4
 [0.4.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.2..0.4.3

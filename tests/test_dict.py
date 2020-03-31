@@ -47,6 +47,12 @@ TEST_DATA = {
             "ref\nto\nnewline": {"$ref": "#/top/with\nnewline"},
         }
     },
+    "base/ref-to-primitive.json": {
+        "top": {
+            "primitive": "foo",
+            "ref_to_primitive": {"$ref": "#/top/primitive"},
+        }
+    },
 }
 
 
@@ -208,6 +214,12 @@ class TestRefDict:
         pointer = JsonPointer("/definitions/foo/not/0")
         assert pointer.resolve(ref_dict) == {"type": "object"}
 
+    @staticmethod
+    def test_dict_with_ref_to_primitive():
+        ref_dict = RefDict("base/ref-to-primitive.json#/")
+        assert ref_dict["top"]["primitive"] == "foo"
+        assert ref_dict["top"]["ref_to_primitive"] == "foo"
+
 
 class TestRefPointer:
     @staticmethod
@@ -306,3 +318,18 @@ class TestRefPointer:
         assert RefPointer(uri.get("nonexistent")).resolve(
             document, default=default
         )
+
+    @staticmethod
+    def test_ref_pointer_returns_non_dict_values(
+        uri: URI, document: Dict[str, Any]
+    ):
+        uri = uri.get("definitions").get("foo").get("type")
+        assert RefPointer(uri).resolve(document) == "string"
+
+    @staticmethod
+    def test_ref_to_primitive():
+        uri = URI.from_string(
+            "base/ref-to-primitive.json#/top/ref_to_primitive"
+        )
+        document = get_document(uri.root)
+        assert RefPointer(uri).resolve(document) == "foo"

@@ -59,7 +59,21 @@ def propagate(uri: URI, value: Any):
     """Ref resolution and propagation of behaviours on __getitem__."""
     if isinstance(value, dict):
         if "$ref" in value and isinstance(value["$ref"], str):
-            return RefDict(uri.relative(value["$ref"]))
+            return _from_uri(uri.relative(value["$ref"]))
+        return RefDict(uri)
+    if isinstance(value, list):
+        return RefList(uri)
+    return value
+
+
+def _from_uri(uri: URI):
+    """Convert URI to corresponding data type.
+
+    Looks ahead at the raw value, and then returns a RefDict, RefList, or
+    other value.
+    """
+    value = resolve_uri(uri)
+    if isinstance(value, dict):
         return RefDict(uri)
     if isinstance(value, list):
         return RefList(uri)

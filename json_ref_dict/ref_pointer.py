@@ -1,15 +1,12 @@
 from collections import abc
 from functools import lru_cache
-from typing import Any, Dict, List, NoReturn, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, NoReturn, Optional, Tuple, Union
 
 from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
 from json_ref_dict.exceptions import DocumentParseError
 from json_ref_dict.loader import get_document
 from json_ref_dict.uri import URI
-
-
-T = TypeVar("T", List, Dict, int, float, str, bool, None)
 
 
 class RefPointer(JsonPointer):
@@ -86,7 +83,7 @@ class RefPointer(JsonPointer):
 
 
 @lru_cache(maxsize=None)
-def resolve_uri(uri: URI) -> T:
+def resolve_uri(uri: URI) -> Union[List, Dict, None, bool, str, int, float]:
     """Find the value for a given URI.
 
     Loads the document and resolves the pointer, bypsasing refs.

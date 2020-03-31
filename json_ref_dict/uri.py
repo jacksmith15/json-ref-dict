@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from json_ref_dict.exceptions import ReferenceParseError
 
 
-JSON_REF_REGEX = r"^((?P<uri_base>.*)\/)?(?P<uri_name>.*)#(?P<pointer>\/.*)$"
+JSON_REF_REGEX = r"^((?P<uri_base>.*)\/)?(?P<uri_name>.*)#(?P<pointer>\/.*)"
 
 
 class URI(NamedTuple):
@@ -23,7 +23,7 @@ class URI(NamedTuple):
             string += "#/"
         if string.endswith("#"):
             string += "/"
-        match = re.match(JSON_REF_REGEX, string)
+        match = re.match(JSON_REF_REGEX, string, re.DOTALL)
         if not match:
             raise ReferenceParseError(
                 f"Couldn't parse '{string}' as a valid reference. "

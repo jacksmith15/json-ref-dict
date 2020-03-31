@@ -35,6 +35,24 @@ TEST_DATA = {
         }
     },
     "base/nonref.json": {"definitions": {"$ref": {"type": "string"}}},
+    "base/with-spaces.json": {
+        "top": {
+            "with spaces": {"foo": "bar"},
+            "ref to spaces": {"$ref": "#/top/with spaces"},
+        }
+    },
+    "base/with-newline.json": {
+        "top": {
+            "with\nnewline": {"foo": "bar"},
+            "ref\nto\nnewline": {"$ref": "#/top/with\nnewline"},
+        }
+    },
+    "base/ref-to-primitive.json": {
+        "top": {
+            "primitive": "foo",
+            "ref_to_primitive": {"$ref": "#/top/primitive"},
+        }
+    },
 }
 
 
@@ -92,6 +110,32 @@ class TestResolveURI:
         non_ref_uri = URI.from_string("base/nonref.json#/definitions")
         non_ref = resolve_uri(non_ref_uri)
         assert non_ref["$ref"] == {"type": "string"}
+
+    @staticmethod
+    def test_get_uri_with_spaces():
+        uri = URI.from_string("base/with-spaces.json#/top/with spaces")
+        result = resolve_uri(uri)
+        assert result == {"foo": "bar"}
+
+    @staticmethod
+    def test_get_ref_with_spaces():
+        uri = URI.from_string("base/with-spaces.json#/top/ref to spaces/foo")
+        result = resolve_uri(uri)
+        assert result == "bar"
+
+    @staticmethod
+    def test_get_uri_with_newline():
+        uri = URI.from_string("base/with-newline.json#/top/with\nnewline")
+        result = resolve_uri(uri)
+        assert result == {"foo": "bar"}
+
+    @staticmethod
+    def test_get_ref_with_newline():
+        uri = URI.from_string(
+            "base/with-newline.json#/top/ref\nto\nnewline/foo"
+        )
+        result = resolve_uri(uri)
+        assert result == "bar"
 
 
 class TestRefDict:
@@ -168,6 +212,12 @@ class TestRefDict:
         ref_dict = RefDict("base/reflist.json#/")
         pointer = JsonPointer("/definitions/foo/not/0")
         assert pointer.resolve(ref_dict) == {"type": "object"}
+
+    @staticmethod
+    def test_dict_with_ref_to_primitive():
+        ref_dict = RefDict("base/ref-to-primitive.json#/")
+        assert ref_dict["top"]["primitive"] == "foo"
+        assert ref_dict["top"]["ref_to_primitive"] == "foo"
 
 
 class TestRefPointer:
@@ -267,3 +317,18 @@ class TestRefPointer:
         assert RefPointer(uri.get("nonexistent")).resolve(
             document, default=default
         )
+
+    @staticmethod
+    def test_ref_pointer_returns_non_dict_values(
+        uri: URI, document: Dict[str, Any]
+    ):
+        uri = uri.get("definitions").get("foo").get("type")
+        assert RefPointer(uri).resolve(document) == "string"
+
+    @staticmethod
+    def test_ref_to_primitive():
+        uri = URI.from_string(
+            "base/ref-to-primitive.json#/top/ref_to_primitive"
+        )
+        document = get_document(uri.root)
+        assert RefPointer(uri).resolve(document) == "foo"

@@ -35,6 +35,18 @@ TEST_DATA = {
         }
     },
     "base/nonref.json": {"definitions": {"$ref": {"type": "string"}}},
+    "base/with-spaces.json": {
+        "top": {
+            "with spaces": {"foo": "bar"},
+            "ref to spaces": {"$ref": "#/top/with spaces"},
+        }
+    },
+    "base/with-newline.json": {
+        "top": {
+            "with\nnewline": {"foo": "bar"},
+            "ref\nto\nnewline": {"$ref": "#/top/with\nnewline"},
+        }
+    },
 }
 
 
@@ -92,6 +104,33 @@ class TestResolveURI:
         non_ref_uri = URI.from_string("base/nonref.json#/definitions")
         non_ref = resolve_uri(non_ref_uri)
         assert non_ref["$ref"] == {"type": "string"}
+
+    @staticmethod
+    def test_get_uri_with_spaces():
+        uri = URI.from_string("base/with-spaces.json#/top/with spaces")
+        result = resolve_uri(uri)
+        assert result == {"foo": "bar"}
+
+    @staticmethod
+    def test_get_ref_with_spaces():
+        uri = URI.from_string("base/with-spaces.json#/top/ref to spaces/foo")
+        result = resolve_uri(uri)
+        assert result == "bar"
+
+    @staticmethod
+    @pytest.mark.foo
+    def test_get_uri_with_newline():
+        uri = URI.from_string("base/with-newline.json#/top/with\nnewline")
+        result = resolve_uri(uri)
+        assert result == {"foo": "bar"}
+
+    @staticmethod
+    def test_get_ref_with_newline():
+        uri = URI.from_string(
+            "base/with-newline.json#/top/ref\nto\nnewline/foo"
+        )
+        result = resolve_uri(uri)
+        assert result == "bar"
 
 
 class TestRefDict:

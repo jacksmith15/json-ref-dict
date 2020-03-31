@@ -124,7 +124,6 @@ class TestResolveURI:
         assert result == "bar"
 
     @staticmethod
-    @pytest.mark.foo
     def test_get_uri_with_newline():
         uri = URI.from_string("base/with-newline.json#/top/with\nnewline")
         result = resolve_uri(uri)

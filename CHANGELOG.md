@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.5.3] - 2020-04-04
 ### Fixed
 * Fixed further issues with immediately chained references.
 
@@ -100,7 +102,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.2..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.3..HEAD
+[0.5.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.2..0.5.3
 [0.5.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.1..0.5.2
 [0.5.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.0..0.5.1
 [0.5.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.4.4..0.5.0

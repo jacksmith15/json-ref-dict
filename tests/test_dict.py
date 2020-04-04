@@ -53,6 +53,17 @@ TEST_DATA = {
             "ref_to_primitive": {"$ref": "#/top/primitive"},
         }
     },
+    "base/from-uri.json": {
+        "refs": {
+            "to_array": {"$ref": "#/array"},
+            "to_object": {"$ref": "#/object"},
+            "to_primitive": {"$ref": "#/primitive"},
+            "to_ref": {"$ref": "#/ref"},
+        },
+        "array": [1, 2, 3],
+        "object": {"foo": "bar"},
+        "primitive": 1,
+    },
 }
 
 
@@ -218,6 +229,45 @@ class TestRefDict:
         ref_dict = RefDict("base/ref-to-primitive.json#/")
         assert ref_dict["top"]["primitive"] == "foo"
         assert ref_dict["top"]["ref_to_primitive"] == "foo"
+
+    @staticmethod
+    def test_from_uri_object():
+        ref_dict = RefDict.from_uri("base/ref-to-primitive.json#/")
+        assert ref_dict == RefDict("base/ref-to-primitive.json#/")
+
+
+class TestFromURI:
+    @staticmethod
+    def test_from_uri_list():
+        ref_list = RefDict.from_uri("base/from-uri.json#/array")
+        assert ref_list == [1, 2, 3]
+
+    @staticmethod
+    def test_from_uri_object():
+        ref_dict = RefDict.from_uri("base/from-uri.json#/object")
+        assert ref_dict == {"foo": "bar"}
+
+    @staticmethod
+    def test_from_uri_primitive():
+        ref_primitive = RefDict.from_uri("base/from-uri.json#/primitive")
+        assert ref_primitive == 1
+
+    @staticmethod
+    def test_from_uri_immediate_ref_list():
+        ref_list = RefDict.from_uri("base/from-uri.json#/refs/to_array")
+        assert ref_list == [1, 2, 3]
+
+    @staticmethod
+    def test_from_uri_immediate_ref_object():
+        ref_object = RefDict.from_uri("base/from-uri.json#/refs/to_object")
+        assert ref_object == {"foo": "bar"}
+
+    @staticmethod
+    def test_from_uri_immediate_ref_primitive():
+        ref_primitive = RefDict.from_uri(
+            "base/from-uri.json#/refs/to_primitive"
+        )
+        assert ref_primitive == 1
 
 
 class TestRefPointer:

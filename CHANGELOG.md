@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed further issues with immediately chained references.
 
 ## [0.5.2] - 2020-04-04
 ### Fixed

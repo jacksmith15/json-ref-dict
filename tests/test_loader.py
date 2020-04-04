@@ -88,3 +88,8 @@ def test_immediately_circular_reference_fails():
 def test_immediate_references_is_detected():
     value = RefDict.from_uri("tests/schemas/immediate-ref.json")
     assert value == {"type": "integer"}
+
+
+def test_immediate_references_can_be_bypassed():
+    value = RefDict.from_uri("tests/schemas/immediate-ref.json#/type")
+    assert value == "integer"

@@ -52,6 +52,11 @@ class RefPointer(JsonPointer):
         :raises JsonPointerException: if `default` is not set and pointer
             could not be resolved.
         """
+        if not list(filter(None, self.parts)):
+            # Handle immediate refs with no pointer.
+            has_remote, remote = self.resolve_remote(doc, 0)
+            if has_remote:
+                return remote
         for idx, part in enumerate(self.parts):
             if not part:
                 continue

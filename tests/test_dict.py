@@ -58,7 +58,6 @@ TEST_DATA = {
             "to_array": {"$ref": "#/array"},
             "to_object": {"$ref": "#/object"},
             "to_primitive": {"$ref": "#/primitive"},
-            "to_ref": {"$ref": "#/ref"},
         },
         "array": [1, 2, 3],
         "object": {"foo": "bar"},

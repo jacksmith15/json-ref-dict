@@ -13,6 +13,9 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Resolving a URI with an immediate reference now correctly
+  resolves that reference.
 
 ## [0.5.1] - 2020-03-31
 ### Fixed

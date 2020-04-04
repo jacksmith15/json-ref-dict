@@ -83,3 +83,8 @@ class TestRefDictIORefs:
 def test_immediately_circular_reference_fails():
     with pytest.raises(ReferenceParseError):
         _ = RefDict("tests/schemas/bad-circular.yaml#/definitions/foo")
+
+
+def test_immediate_references_is_detected():
+    value = RefDict.from_uri("tests/schemas/immediate-ref.json")
+    assert value == {"type": "integer"}

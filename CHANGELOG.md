@@ -13,6 +13,10 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Added
+* Added support for URL encoded characters in references.
+  `RefPointer` will now attempt the pointer segment as is,
+  and fallback to the decoded version if that fails.
 
 ## [0.5.3] - 2020-04-04
 ### Fixed

@@ -134,15 +134,21 @@ class TestResolveURI:
         assert non_ref["$ref"] == {"type": "string"}
 
     @staticmethod
-    def test_get_uri_with_spaces():
-        uri = URI.from_string("base/with-spaces.json#/top/with spaces")
+    @pytest.mark.parametrize(
+        "reference",
+        [
+            "base/with-spaces.json#/top/with spaces",
+            "base/with-spaces.json#/top/with%20spaces",
+        ],
+    )
+    def test_get_uri_with_spaces(reference: str):
+        uri = URI.from_string(reference)
         result = resolve_uri(uri)
         assert result == {"foo": "bar"}
 
     @staticmethod
     @pytest.mark.parametrize(
-        "base",
-        ["base/with-spaces.json", "base/with-spaces-encoded.json"]
+        "base", ["base/with-spaces.json", "base/with-spaces-encoded.json"]
     )
     def test_get_ref_with_spaces(base: str):
         uri = URI.from_string(f"{base}#/top/ref to spaces/foo")
@@ -150,20 +156,24 @@ class TestResolveURI:
         assert result == "bar"
 
     @staticmethod
-    def test_get_uri_with_newline():
-        uri = URI.from_string("base/with-newline.json#/top/with\nnewline")
+    @pytest.mark.parametrize(
+        "reference",
+        [
+            "base/with-newline.json#/top/with\nnewline",
+            "base/with-newline.json#/top/with%0Anewline",
+        ],
+    )
+    def test_get_uri_with_newline(reference: str):
+        uri = URI.from_string(reference)
         result = resolve_uri(uri)
         assert result == {"foo": "bar"}
 
     @staticmethod
     @pytest.mark.parametrize(
-        "base",
-        ["base/with-newline.json", "base/with-newline-encoded.json"]
+        "base", ["base/with-newline.json", "base/with-newline-encoded.json"]
     )
     def test_get_ref_with_newline(base: str):
-        uri = URI.from_string(
-            f"{base}#/top/ref\nto\nnewline/foo"
-        )
+        uri = URI.from_string(f"{base}#/top/ref\nto\nnewline/foo")
         result = resolve_uri(uri)
         assert result == "bar"
 

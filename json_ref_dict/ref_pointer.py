@@ -1,6 +1,7 @@
 from collections import abc
 from functools import lru_cache
 from typing import Any, Dict, List, NoReturn, Optional, Tuple, Union
+from urllib.parse import unquote
 
 from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
@@ -59,7 +60,10 @@ class RefPointer(JsonPointer):
             if not part:
                 continue
             try:
-                doc = self.walk(doc, part)
+                try:
+                    doc = self.walk(doc, part)
+                except JsonPointerException:
+                    doc = self.walk(doc, unquote(part))
                 has_remote, remote = self.resolve_remote(doc, idx)
                 if has_remote:
                     return remote

@@ -65,6 +65,16 @@ TEST_DATA = {
             "ref_to_primitive": {"$ref": "#/top/primitive"},
         }
     },
+    "base/with-escaped-chars.json": {
+        "tilda~field": {"type": "integer"},
+        "slash/field": {"type": "integer"},
+        "percent%field": {"type": "integer"},
+        "properties": {
+            "tilda": {"$ref": "#/tilda~0field"},
+            "slash": {"$ref": "#/slash~1field"},
+            "percent": {"$ref": "#/percent%25field"},
+        },
+    },
     "base/from-uri.json": {
         "refs": {
             "to_array": {"$ref": "#/array"},
@@ -176,6 +186,15 @@ class TestResolveURI:
         uri = URI.from_string(f"{base}#/top/ref\nto\nnewline/foo")
         result = resolve_uri(uri)
         assert result == "bar"
+
+    @staticmethod
+    @pytest.mark.parametrize("field", ["tilda", "slash", "percent",])
+    def test_get_ref_with_escaped_chars(field: str):
+        uri = URI.from_string(
+            f"base/with-escaped-chars.json#/properties/{field}"
+        )
+        result = resolve_uri(uri)
+        assert result == {"type": "integer"}
 
 
 class TestRefDict:

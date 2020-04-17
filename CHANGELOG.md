@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.6.0] - 2020-04-17
 ### Added
 * Added support for URL encoded characters in references.
   `RefPointer` will now attempt the pointer segment as is,
@@ -106,7 +108,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.3..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.0..HEAD
+[0.6.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.3..0.6.0
 [0.5.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.2..0.5.3
 [0.5.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.1..0.5.2
 [0.5.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.0..0.5.1

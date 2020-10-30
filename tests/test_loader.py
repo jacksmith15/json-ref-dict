@@ -1,3 +1,5 @@
+import pathlib
+import posixpath
 from os import getcwd, path
 
 import pytest
@@ -23,8 +25,7 @@ class TestRefDictIORefs:
             path.join(getcwd(), "tests/schemas/master.yaml#/definitions"),
             # explicit file scheme
             (
-                "file://"
-                + path.join(getcwd(), "tests/schemas/master.yaml#/definitions")
+                pathlib.Path(posixpath.join(getcwd(), "tests/schemas/master.yaml#/definitions")).as_uri()
             ),
             # https URI
             PINNED_FILE_URL + "#/definitions",

@@ -1,3 +1,4 @@
+import posixpath
 from os import path
 from typing import (
     Any,
@@ -37,7 +38,7 @@ def _next_path(current_path: str) -> Callable[[str], str]:
     """
 
     def _wrap(segment: str):
-        return path.join(current_path, segment)
+        return posixpath.join(current_path, segment)
 
     return _wrap
 

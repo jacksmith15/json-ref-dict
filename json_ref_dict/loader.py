@@ -1,4 +1,6 @@
 import cgi
+import pathlib
+import posixpath
 from functools import lru_cache
 import json
 import mimetypes
@@ -42,7 +44,7 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     url = urlparse(base_uri)
     if not url.scheme:
         prefix = "" if base_uri.startswith("/") else getcwd()
-        base_uri = "file://" + path.join(prefix, base_uri)
+        base_uri = pathlib.Path(posixpath.join(prefix, base_uri)).as_uri()
     with urlopen(base_uri) as conn:
         loader = _get_loader(conn)
         content = loader(conn)

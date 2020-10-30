@@ -3,13 +3,17 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
-
+import re
 from codecs import open
 from os import path
 
 from setuptools import find_packages, setup
 
-import json_ref_dict
+
+__version__ = re.search(
+    r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment too
+    open('json_ref_dict/__init__.py', encoding='utf_8_sig').read()
+    ).group(1)
 
 
 REQUIREMENTS_FILE_PATH = path.join(
@@ -29,7 +33,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name="json-ref-dict",
-    version=json_ref_dict.__version__,
+    version=__version__,
     description=(
         "Python dict-like object which abstracts resolution of "
         "JSONSchema references"

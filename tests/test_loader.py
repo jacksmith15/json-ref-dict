@@ -1,6 +1,6 @@
 import pathlib
 import posixpath
-from os import getcwd, path
+from os import getcwd
 
 import pytest
 

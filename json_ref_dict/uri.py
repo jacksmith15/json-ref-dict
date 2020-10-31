@@ -1,5 +1,4 @@
 import posixpath
-from os import path
 import re
 from typing import NamedTuple
 from urllib.parse import urlparse

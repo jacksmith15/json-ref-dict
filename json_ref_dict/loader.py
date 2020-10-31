@@ -44,8 +44,8 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     """
     if os.name == "nt" and path.isfile(base_uri) and path.isabs(base_uri):
         # https://bugs.python.org/issue42215
-        # Windows paths drives are incorrectly detected as an uri schema, check if is an existing file
-        # and convert to file://
+        # Windows paths drives are incorrectly detected as an uri schema, check
+        # if is an existing file and convert to file://
         base_uri = pathlib.Path(base_uri).as_uri()
     url = urlparse(base_uri)
     if not url.scheme:

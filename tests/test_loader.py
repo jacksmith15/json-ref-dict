@@ -22,10 +22,10 @@ class TestRefDictIORefs:
             # relative filepath
             "tests/schemas/master.yaml#/definitions",
             # absolute filepath
-            path.join(getcwd(), "tests/schemas/master.yaml#/definitions"),
+            posixpath.join(getcwd(), "tests/schemas/master.yaml#/definitions"),
             # explicit file scheme
             (
-                pathlib.Path(posixpath.join(getcwd(), "tests/schemas/master.yaml#/definitions")).as_uri()
+                pathlib.Path(posixpath.join(getcwd(), "tests/schemas/master.yaml")).as_uri() + "#/definitions"
             ),
             # https URI
             PINNED_FILE_URL + "#/definitions",

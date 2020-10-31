@@ -188,7 +188,14 @@ class TestResolveURI:
         assert result == "bar"
 
     @staticmethod
-    @pytest.mark.parametrize("field", ["tilda", "slash", "percent",])
+    @pytest.mark.parametrize(
+        "field",
+        [
+            "tilda",
+            "slash",
+            "percent",
+        ],
+    )
     def test_get_ref_with_escaped_chars(field: str):
         uri = URI.from_string(
             f"base/with-escaped-chars.json#/properties/{field}"

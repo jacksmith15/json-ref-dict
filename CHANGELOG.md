@@ -13,6 +13,15 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Fixed Windows path handling, changing all references of
+  path.join to posixpath.join, using pathlib to create
+  file:// paths, and circumventing Python bug 42215
+  with urllib.parse.urlparse mishandling Windows paths.
+* Setup.py was importing the package itself, causing
+  exceptions when installing by source. Following best
+  practices, a regex is used to extract the version from
+  the source code. 
 
 ## [0.6.0] - 2020-04-17
 ### Added

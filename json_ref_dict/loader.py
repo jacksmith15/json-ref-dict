@@ -1,4 +1,7 @@
 import cgi
+import os
+import pathlib
+import posixpath
 from functools import lru_cache
 import json
 import mimetypes
@@ -39,10 +42,15 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     `urllib.request.urlopen`.
     :return: Raw content found at the URI.
     """
+    if os.name == "nt" and path.isfile(base_uri) and path.isabs(base_uri):
+        # https://bugs.python.org/issue42215
+        # Windows paths drives are incorrectly detected as an uri schema, check
+        # if is an existing file and convert to file://
+        base_uri = pathlib.Path(base_uri).as_uri()
     url = urlparse(base_uri)
     if not url.scheme:
         prefix = "" if base_uri.startswith("/") else getcwd()
-        base_uri = "file://" + path.join(prefix, base_uri)
+        base_uri = pathlib.Path(posixpath.join(prefix, base_uri)).as_uri()
     with urlopen(base_uri) as conn:
         loader = _get_loader(conn)
         content = loader(conn)

@@ -1,4 +1,4 @@
-from os import path
+import posixpath
 import re
 from typing import NamedTuple
 from urllib.parse import urlparse
@@ -36,7 +36,7 @@ class URI(NamedTuple):
     @property
     def root(self):
         """String representation excluding the JSON pointer."""
-        return path.join(*filter(None, [self.uri_base, self.uri_name]))
+        return posixpath.join(*filter(None, [self.uri_base, self.uri_name]))
 
     def _get_relative(self, reference: str) -> "URI":
         """Get a new URI relative to the current root."""
@@ -47,7 +47,7 @@ class URI(NamedTuple):
             return URI(self.uri_base, self.uri_name, reference)
         # Remote reference.
         return self.from_string(
-            path.join(*filter(None, [self.uri_base, reference]))
+            posixpath.join(*filter(None, [self.uri_base, reference]))
         )
 
     def relative(self, reference: str) -> "URI":
@@ -73,13 +73,13 @@ class URI(NamedTuple):
         return self.__class__(
             uri_base=self.uri_base,
             uri_name=self.uri_name,
-            pointer=path.join(self.pointer, *pointer_segments),
+            pointer=posixpath.join(self.pointer, *pointer_segments),
         )
 
     def back(self) -> "URI":
         """Pop a segment from the pointer."""
         segments = self.pointer.split("/")
-        pointer = path.join("/", *segments[:-1])
+        pointer = posixpath.join("/", *segments[:-1])
         return self.__class__(
             uri_base=self.uri_base, uri_name=self.uri_name, pointer=pointer
         )

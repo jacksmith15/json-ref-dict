@@ -42,7 +42,7 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
     `urllib.request.urlopen`.
     :return: Raw content found at the URI.
     """
-    if os.name == 'nt' and path.isfile(base_uri) and path.isabs(base_uri):
+    if os.name == "nt" and path.isfile(base_uri) and path.isabs(base_uri):
         # https://bugs.python.org/issue42215
         # Windows paths drives are incorrectly detected as an uri schema, check if is an existing file
         # and convert to file://

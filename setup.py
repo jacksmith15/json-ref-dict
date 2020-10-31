@@ -12,8 +12,8 @@ from setuptools import find_packages, setup
 
 __version__ = re.search(
     r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment too
-    open('json_ref_dict/__init__.py', encoding='utf_8_sig').read()
-    ).group(1)
+    open("json_ref_dict/__init__.py", encoding="utf_8_sig").read(),
+).group(1)
 
 
 REQUIREMENTS_FILE_PATH = path.join(

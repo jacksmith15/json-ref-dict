@@ -1,7 +1,7 @@
 .PHONY: build
 
 RUN_CLEAN_TEST:=bash run_test.sh -c
-CHECK_VIRTUALENV:=python -c "import sys;sys.real_prefix"
+CHECK_VIRTUALENV:=python -c "import sys;assert sys.prefix != sys.base_prefix"
 
 
 help: ## Prints this help/overview message
@@ -12,7 +12,7 @@ clean: ## Cleans all testing metadata and .pyc files.
 
 install: ## Installs all dependencies
 	$(CHECK_VIRTUALENV) || (echo "Not inside a virtualenv, aborting."; exit 1)
-	pip install -r requirements.txt -r requirements-test.txt	
+	pip install -r requirements.txt -r requirements-test.txt
 
 test: install ## Runs all tests
 	$(RUN_CLEAN_TEST) -a

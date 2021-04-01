@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.6.2] - 2021-04-01
 ### Fixed
 * Dependency on `jsonpointer` is now flexible.
 
@@ -121,7 +123,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.1..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.2..HEAD
+[0.6.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.1..0.6.2
 [0.6.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.0..0.6.1
 [0.6.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.3..0.6.0
 [0.5.3]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.2..0.5.3

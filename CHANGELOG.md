@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+### Fixed
+* Dependency on `jsonpointer` is now flexible.
 
 ## [0.6.1] - 2020-10-31
 ### Fixed

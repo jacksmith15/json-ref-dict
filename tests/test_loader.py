@@ -5,7 +5,7 @@ from os import getcwd
 import pytest
 
 from json_ref_dict import RefDict
-from json_ref_dict.loader import loader
+from json_ref_dict.loader import loader, default_get_document
 from json_ref_dict.exceptions import DocumentParseError, ReferenceParseError
 
 
@@ -19,6 +19,9 @@ def test_loader_registration(request):
     """
     request.addfinalizer(loader.loaders.clear)
 
+    assert loader.default is default_get_document
+    assert not loader.loaders
+
     # pylint:disable=unused-argument
     @loader.register
     def useless(baseuri):
@@ -28,9 +31,15 @@ def test_loader_registration(request):
     loader.unregister(useless)
     assert list(loader) == []
 
+    with pytest.raises(ValueError) as exc:
+        loader.unregister(useless)
+    assert str(exc.value) == f'{useless} is not a known loader.'
+
     loader.register(useless)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         loader.register(useless)
+    assert str(exc.value) == f'{useless} is already a known loader.'
+
 
     loader.loaders.clear()
     assert list(loader) == []

@@ -21,7 +21,7 @@ DocumentLoader = Callable[[str], JSONSchema]
 try:
     import yaml
 
-    CONTENT_PARSER: Parser = yaml.safe_load  # pragma: no cover
+    CONTENT_PARSER: Parser = yaml.safe_load
 except ImportError:  # pragma: no cover
     CONTENT_PARSER: Parser = json.load  # type: ignore
 
@@ -41,13 +41,13 @@ class Loader:
 
     def register(self, _loader):
         if _loader in self.loaders:
-            raise ValueError(f"{loader} is already a known loader.")
+            raise ValueError(f"{_loader} is already a known loader.")
         self.loaders.appendleft(_loader)
         return _loader
 
     def unregister(self, _loader):
         if _loader not in self.loaders:
-            raise ValueError(f"{loader} is not a known loader.")
+            raise ValueError(f"{_loader} is not a known loader.")
         self.loaders.remove(_loader)
 
     def __call__(self, base_uri) -> JSONSchema:

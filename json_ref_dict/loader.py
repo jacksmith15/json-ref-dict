@@ -2,29 +2,66 @@ import cgi
 import os
 import pathlib
 import posixpath
+from collections import deque
 from functools import lru_cache
 import json
 import mimetypes
 from os import getcwd, path
-from typing import Any, Callable, Dict, IO
+from typing import Any, Callable, Dict, IO, Deque
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
 from json_ref_dict.exceptions import DocumentParseError
 
 
-CONTENT_LOADER: Callable[[IO], Dict]
+JSONSchema = Dict[str, Any]
+Parser = Callable[[IO], JSONSchema]
+DocumentLoader = Callable[[str], JSONSchema]
 
 try:
     import yaml
 
-    CONTENT_LOADER = yaml.safe_load
+    CONTENT_PARSER: Parser = yaml.safe_load
 except ImportError:  # pragma: no cover
-    CONTENT_LOADER = json.load  # pragma: no cover
+    CONTENT_PARSER: Parser = json.load  # pragma: no cover
+
+
+class Loader(DocumentLoader):
+
+    slots = ('loaders', 'default')
+
+    loaders: Deque[DocumentLoader]
+    default: DocumentLoader
+
+    def __init__(self, default: DocumentLoader):
+        self.loaders = deque()  # allows playing with order.
+        self.default = default
+
+    def __iter__(self):
+        return iter(self.loaders)
+
+    def register(self, loader):
+        if loader in self.loaders:
+            raise ValueError(f"{loader} is already a known loader.")
+        self.loaders.appendleft(loader)
+        return loader
+
+    def remove(self, loader):
+        if loader not in self.loaders:
+            raise ValueError(f"{loader} is not a known loader.")
+        self.loaders.remove(loader)
+
+    def __call__(self, base_uri) -> JSONSchema:
+        if self.loaders:
+            for loader in self.loaders:
+                loaded = loader(base_uri)
+                if loaded is not ...:
+                    return loaded
+        return self.default(base_uri)
 
 
 @lru_cache(maxsize=None)
-def get_document(base_uri: str):
+def default_get_document(base_uri: str) -> JSONSchema:
     """Load a document based on URI root."""
     try:
         return _read_document_content(base_uri)
@@ -34,10 +71,8 @@ def get_document(base_uri: str):
 
 def _read_document_content(base_uri: str) -> Dict[str, Any]:
     """Resolve document content from the base URI.
-
     If the URI has no scheme, assume local filesystem loading, appending
     the current working directory if the path is not absolute.
-
     Defers to `urllib` and may raise any exceptions from
     `urllib.request.urlopen`.
     :return: Raw content found at the URI.
@@ -62,15 +97,22 @@ def _get_loader(conn) -> Callable:
     content_type = _get_content_type(conn)
     if "json" in content_type:
         return json.load
-    return CONTENT_LOADER  # Fall back to default (yaml if installed)
+    return CONTENT_PARSER  # Fall back to default (yaml if installed)
 
 
 def _get_content_type(conn) -> str:
     """Pull out mime type from a connection.
-
     Prefer explicit header if available, otherwise guess from url.
     """
     content_type = mimetypes.guess_type(conn.url)[0] or ""
     if hasattr(conn, "getheaders"):
-        content_type = dict(conn.getheaders()).get("Content-Type", content_type)
+        content_type = dict(conn.getheaders()).get(
+            "Content-Type", content_type)
     return cgi.parse_header(content_type)[0]
+
+
+# Can possibly be hotswitched by patching.
+loader = Loader(default=default_get_document)
+
+# backward compatibility
+get_document = loader

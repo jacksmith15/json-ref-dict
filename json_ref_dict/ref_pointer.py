@@ -36,7 +36,7 @@ class RefPointer(JsonPointer):
         ):
             return False, None
         remote_uri = self.uri.relative(doc["$ref"]).get(
-            *self.parts[parts_idx + 1 :]
+            *self.parts[parts_idx + 1:]
         )
         return True, resolve_uri(remote_uri)
 

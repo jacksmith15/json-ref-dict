@@ -1,6 +1,4 @@
 from typing import Any, Dict, Iterable, Tuple, Union
-from unittest.mock import patch
-
 from jsonpointer import JsonPointer, JsonPointerException
 import pytest
 
@@ -94,6 +92,7 @@ class TestResolveURI:
     @classmethod
     def setup_class(cls):
 
+        # pylint:disable=unused-variable
         @loader.register
         def get_document(base_uri: str):
             return TEST_DATA[base_uri]
@@ -210,6 +209,7 @@ class TestRefDict:
     @classmethod
     def setup_class(cls):
 
+        # pylint:disable=unused-variable
         @loader.register
         def get_document(base_uri: str):
             return TEST_DATA[base_uri]
@@ -309,6 +309,7 @@ class TestFromURI:
     @classmethod
     def setup_class(cls):
 
+        # pylint:disable=unused-variable
         @loader.register
         def get_document(base_uri: str):
             return TEST_DATA[base_uri]
@@ -355,6 +356,7 @@ class TestRefPointer:
     @classmethod
     def setup_class(cls):
 
+        # pylint:disable=unused-variable
         @loader.register
         def get_document(base_uri: str):
             return TEST_DATA[base_uri]

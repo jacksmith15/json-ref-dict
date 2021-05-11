@@ -21,17 +21,16 @@ DocumentLoader = Callable[[str], JSONSchema]
 try:
     import yaml
 
-    CONTENT_PARSER: Parser = yaml.safe_load
+    CONTENT_PARSER: Parser = yaml.safe_load  # pragma: no cover
 except ImportError:  # pragma: no cover
-    CONTENT_PARSER: Parser = json.load  # pragma: no cover
+    CONTENT_PARSER: Parser = json.load  # type: ignore
 
 
-class Loader(DocumentLoader):
+class Loader:
 
-    slots = ('loaders', 'default')
+    slots = ("loaders", "default")
 
     loaders: Deque[DocumentLoader]
-    default: DocumentLoader
 
     def __init__(self, default: DocumentLoader):
         self.loaders = deque()  # allows playing with order.
@@ -40,21 +39,21 @@ class Loader(DocumentLoader):
     def __iter__(self):
         return iter(self.loaders)
 
-    def register(self, loader):
-        if loader in self.loaders:
+    def register(self, _loader):
+        if _loader in self.loaders:
             raise ValueError(f"{loader} is already a known loader.")
-        self.loaders.appendleft(loader)
-        return loader
+        self.loaders.appendleft(_loader)
+        return _loader
 
-    def remove(self, loader):
-        if loader not in self.loaders:
+    def unregister(self, _loader):
+        if _loader not in self.loaders:
             raise ValueError(f"{loader} is not a known loader.")
-        self.loaders.remove(loader)
+        self.loaders.remove(_loader)
 
     def __call__(self, base_uri) -> JSONSchema:
         if self.loaders:
-            for loader in self.loaders:
-                loaded = loader(base_uri)
+            for _loader in self.loaders:
+                loaded = _loader(base_uri)
                 if loaded is not ...:
                     return loaded
         return self.default(base_uri)
@@ -87,8 +86,8 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
         prefix = "" if base_uri.startswith("/") else getcwd()
         base_uri = pathlib.Path(posixpath.join(prefix, base_uri)).as_uri()
     with urlopen(base_uri) as conn:
-        loader = _get_loader(conn)
-        content = loader(conn)
+        _loader = _get_loader(conn)
+        content = _loader(conn)
     return content
 
 
@@ -106,13 +105,14 @@ def _get_content_type(conn) -> str:
     """
     content_type = mimetypes.guess_type(conn.url)[0] or ""
     if hasattr(conn, "getheaders"):
-        content_type = dict(conn.getheaders()).get(
-            "Content-Type", content_type)
+        content_type = dict(conn.getheaders()).get("Content-Type", content_type)
     return cgi.parse_header(content_type)[0]
 
 
 # Can possibly be hotswitched by patching.
-loader = Loader(default=default_get_document)
+# pylint:disable=invalid-name
+loader = Loader(default_get_document)
 
 # backward compatibility
+# pylint:disable=invalid-name
 get_document = loader

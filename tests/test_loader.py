@@ -14,11 +14,31 @@ PINNED_FILE_URL = (
     "c19989a95449df587b62abea89aeb83676/tests/schemas/master.yaml"
 )
 
+def test_loader_registration(request):
+    """Tests the loaders iterable management
+    """
+    request.addfinalizer(loader.loaders.clear)
+
+    # pylint:disable=unused-argument
+    @loader.register
+    def useless(baseuri):
+        return ...
+
+    assert list(loader) == [useless]
+    loader.unregister(useless)
+    assert list(loader) == []
+
+    loader.register(useless)
+    with pytest.raises(ValueError):
+        loader.register(useless)
+
+    loader.loaders.clear()
+    assert list(loader) == []
+
 
 def test_loader_registration_chain(request):
     """Tests LIFO registration
     """
-
     request.addfinalizer(loader.loaders.clear)
 
     @loader.register

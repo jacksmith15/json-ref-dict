@@ -156,16 +156,15 @@ def _materialize_recursive(
         return None
     # Keep a record of walking this URI and recurse through the
     # contained items.
-    repeats[item.uri] = _RepeatCache(
-        source=JsonPointer(pointer), repeats=set())
+    repeats[item.uri] = _RepeatCache(source=JsonPointer(pointer), repeats=set())
 
     def recur(seg, data):
         return _materialize_recursive(
             conf, repeats, _next_path(pointer)(parse_segment(seg)), data
         )
+
     if isinstance(item, RefList):
-        return [recur(str(idx), subitem)
-                for idx, subitem in enumerate(item)]
+        return [recur(str(idx), subitem) for idx, subitem in enumerate(item)]
     return {
         **conf.label(item),
         **{

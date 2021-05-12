@@ -23,40 +23,43 @@ try:
 
     CONTENT_PARSER: Parser = yaml.safe_load
 except ImportError:  # pragma: no cover
-    CONTENT_PARSER: Parser = json.load  # type: ignore
+    CONTENT_PARSER = json.load  # pragma: no cover
 
 
 class Loader:
 
-    __slots__ = ("loaders", "default")
+    __slots__ = ("_loaders", "_default")
 
-    loaders: Deque[DocumentLoader]
+    _loaders: Deque[DocumentLoader]
 
     def __init__(self, default: DocumentLoader):
-        self.loaders = deque()  # allows playing with order.
-        self.default = default
+        self._loaders = deque()  # allows playing with order.
+        self._default = default
 
     def __iter__(self):
-        return iter(self.loaders)
+        return iter(self._loaders)
+
+    def clear(self):
+        return self._loaders.clear()
 
     def register(self, _loader):
-        if _loader in self.loaders:
+        if _loader in self._loaders:
             raise ValueError(f"{_loader} is already a known loader.")
-        self.loaders.appendleft(_loader)
+        self._loaders.appendleft(_loader)
         return _loader
 
     def unregister(self, _loader):
-        if _loader not in self.loaders:
+        if _loader not in self._loaders:
             raise ValueError(f"{_loader} is not a known loader.")
-        self.loaders.remove(_loader)
+        self._loaders.remove(_loader)
 
     def __call__(self, base_uri) -> JSONSchema:
-        if self.loaders:
-            for _loader in self.loaders:
+        if self._loaders:
+            for _loader in self._loaders:
                 loaded = _loader(base_uri)
                 if loaded is not ...:
                     return loaded
-        return self.default(base_uri)
+        return self._default(base_uri)
 
 
 @lru_cache(maxsize=None)
@@ -105,14 +108,13 @@ def _get_content_type(conn) -> str:
     """
     content_type = mimetypes.guess_type(conn.url)[0] or ""
     if hasattr(conn, "getheaders"):
-        content_type = dict(conn.getheaders()).get("Content-Type", content_type)
+        content_type = dict(conn.getheaders()).get(
+            "Content-Type", content_type)
     return cgi.parse_header(content_type)[0]
 
 
 # Can possibly be hotswitched by patching.
-# pylint:disable=invalid-name
-loader = Loader(default_get_document)
+loader: Loader = Loader(default_get_document)
 
 # backward compatibility
-# pylint:disable=invalid-name
-get_document = loader
+get_document: Loader = loader

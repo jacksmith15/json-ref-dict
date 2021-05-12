@@ -5,7 +5,7 @@ from os import getcwd
 import pytest
 
 from json_ref_dict import RefDict
-from json_ref_dict.loader import loader, default_get_document
+from json_ref_dict.loader import loader
 from json_ref_dict.exceptions import DocumentParseError, ReferenceParseError
 
 
@@ -17,10 +17,9 @@ PINNED_FILE_URL = (
 def test_loader_registration(request):
     """Tests the loaders iterable management
     """
-    request.addfinalizer(loader.loaders.clear)
+    request.addfinalizer(loader.clear)
 
-    assert loader.default is default_get_document
-    assert not loader.loaders
+    assert not list(loader)
 
     # pylint:disable=unused-argument
     @loader.register
@@ -41,14 +40,14 @@ def test_loader_registration(request):
     assert str(exc.value) == f'{useless} is already a known loader.'
 
 
-    loader.loaders.clear()
+    loader.clear()
     assert list(loader) == []
 
 
 def test_loader_registration_chain(request):
     """Tests LIFO registration
     """
-    request.addfinalizer(loader.loaders.clear)
+    request.addfinalizer(loader.clear)
 
     @loader.register
     def no_remote(baseuri):

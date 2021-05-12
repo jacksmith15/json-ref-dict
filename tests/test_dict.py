@@ -87,19 +87,18 @@ TEST_DATA = {
 }
 
 
+@pytest.fixture(scope="module", autouse=True)
+def override_loader():
+    @loader.register
+    def _get_document(base_uri: str):
+        return TEST_DATA[base_uri]
+    try:
+        yield
+    finally:
+        loader.clear()
+
+
 class TestResolveURI:
-
-    @classmethod
-    def setup_class(cls):
-
-        # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
-            return TEST_DATA[base_uri]
-
-    @classmethod
-    def teardown_class(cls):
-        loader.loaders.clear()
 
     @staticmethod
     def test_get_no_ref():
@@ -206,18 +205,6 @@ class TestResolveURI:
 
 class TestRefDict:
 
-    @classmethod
-    def setup_class(cls):
-
-        # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
-            return TEST_DATA[base_uri]
-
-    @classmethod
-    def teardown_class(cls):
-        loader.loaders.clear()
-
     @staticmethod
     @pytest.fixture(scope="class")
     def ref_dict():
@@ -306,18 +293,6 @@ class TestRefDict:
 
 class TestFromURI:
 
-    @classmethod
-    def setup_class(cls):
-
-        # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
-            return TEST_DATA[base_uri]
-
-    @classmethod
-    def teardown_class(cls):
-        loader.loaders.clear()
-
     @staticmethod
     def test_from_uri_list():
         ref_list = RefDict.from_uri("base/from-uri.json#/array")
@@ -352,18 +327,6 @@ class TestFromURI:
 
 
 class TestRefPointer:
-
-    @classmethod
-    def setup_class(cls):
-
-        # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
-            return TEST_DATA[base_uri]
-
-    @classmethod
-    def teardown_class(cls):
-        loader.loaders.clear()
 
     @staticmethod
     @pytest.fixture(scope="class")

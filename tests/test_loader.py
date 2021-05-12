@@ -5,7 +5,7 @@ from os import getcwd
 import pytest
 
 from json_ref_dict import RefDict
-from json_ref_dict.loader import loader, default_get_document
+from json_ref_dict.loader import get_document, Loader
 from json_ref_dict.exceptions import DocumentParseError, ReferenceParseError
 
 
@@ -17,57 +17,56 @@ PINNED_FILE_URL = (
 def test_loader_registration(request):
     """Tests the loaders iterable management
     """
-    request.addfinalizer(loader.loaders.clear)
+    request.addfinalizer(get_document.clear)
 
-    assert loader.default is default_get_document
-    assert not loader.loaders
+    assert isinstance(get_document, Loader)
+    assert list(get_document) == []
 
     # pylint:disable=unused-argument
-    @loader.register
+    @get_document.register
     def useless(baseuri):
         return ...
 
-    assert list(loader) == [useless]
-    loader.unregister(useless)
-    assert list(loader) == []
+    assert list(get_document) == [useless]
+    get_document.unregister(useless)
+    assert list(get_document) == []
 
     with pytest.raises(ValueError) as exc:
-        loader.unregister(useless)
+        get_document.unregister(useless)
     assert str(exc.value) == f'{useless} is not a known loader.'
 
-    loader.register(useless)
+    get_document.register(useless)
     with pytest.raises(ValueError) as exc:
-        loader.register(useless)
+        get_document.register(useless)
     assert str(exc.value) == f'{useless} is already a known loader.'
 
-
-    loader.loaders.clear()
-    assert list(loader) == []
+    get_document.clear()
+    assert list(get_document) == []
 
 
 def test_loader_registration_chain(request):
     """Tests LIFO registration
     """
-    request.addfinalizer(loader.loaders.clear)
+    request.addfinalizer(get_document.clear)
 
-    @loader.register
+    @get_document.register
     def no_remote(baseuri):
         if baseuri.startswith('http://') or baseuri.startswith('https://'):
             return ...
         return {'foo': 'bar'}
 
-    @loader.register
+    @get_document.register
     def file_loader(baseuri):
         if baseuri.startswith('file://'):
             return {'bar': 'qux'}
         return ...
 
-    assert list(loader) == [file_loader, no_remote]
+    assert list(get_document) == [file_loader, no_remote]
 
-    schema = loader('file://myfile.json')
+    schema = get_document('file://myfile.json')
     assert schema == {'bar': 'qux'}
 
-    schema = loader(PINNED_FILE_URL)
+    schema = get_document(PINNED_FILE_URL)
     assert dict(schema) == {
         'definitions': {
             'backref': {'$ref': 'other.yaml#/definitions/baz'},
@@ -77,7 +76,7 @@ def test_loader_registration_chain(request):
         }
     }
 
-    schema = loader('not https')
+    schema = get_document('not https')
     assert schema == {'foo': 'bar'}
 
 

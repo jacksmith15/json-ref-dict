@@ -4,7 +4,7 @@ import pytest
 
 from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
 from json_ref_dict.ref_dict import RefList
-from json_ref_dict.loader import loader
+from json_ref_dict.loader import get_document
 
 
 TEST_DATA = {
@@ -93,13 +93,13 @@ class TestResolveURI:
     def setup_class(cls):
 
         # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
+        @get_document.register
+        def document_registry(base_uri: str):
             return TEST_DATA[base_uri]
 
     @classmethod
     def teardown_class(cls):
-        loader.loaders.clear()
+        get_document.clear()
 
     @staticmethod
     def test_get_no_ref():
@@ -210,13 +210,13 @@ class TestRefDict:
     def setup_class(cls):
 
         # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
+        @get_document.register
+        def document_registry(base_uri: str):
             return TEST_DATA[base_uri]
 
     @classmethod
     def teardown_class(cls):
-        loader.loaders.clear()
+        get_document.clear()
 
     @staticmethod
     @pytest.fixture(scope="class")
@@ -310,13 +310,13 @@ class TestFromURI:
     def setup_class(cls):
 
         # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
+        @get_document.register
+        def document_registry(base_uri: str):
             return TEST_DATA[base_uri]
 
     @classmethod
     def teardown_class(cls):
-        loader.loaders.clear()
+        get_document.clear()
 
     @staticmethod
     def test_from_uri_list():
@@ -357,13 +357,13 @@ class TestRefPointer:
     def setup_class(cls):
 
         # pylint:disable=unused-variable
-        @loader.register
-        def get_document(base_uri: str):
+        @get_document.register
+        def document_registry(base_uri: str):
             return TEST_DATA[base_uri]
 
     @classmethod
     def teardown_class(cls):
-        loader.loaders.clear()
+        get_document.clear()
 
     @staticmethod
     @pytest.fixture(scope="class")
@@ -373,7 +373,7 @@ class TestRefPointer:
     @staticmethod
     @pytest.fixture(scope="class")
     def document(uri: URI) -> Dict[str, Any]:
-        return loader(uri.root)
+        return get_document(uri.root)
 
     @staticmethod
     @pytest.mark.parametrize("method", ["resolve", "get"])
@@ -474,5 +474,5 @@ class TestRefPointer:
         uri = URI.from_string(
             "base/ref-to-primitive.json#/top/ref_to_primitive"
         )
-        document = loader(uri.root)
+        document = get_document(uri.root)
         assert RefPointer(uri).resolve(document) == "foo"

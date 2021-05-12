@@ -10,7 +10,6 @@ from os import getcwd, path
 from typing import Any, Callable, Dict, IO, Deque
 from urllib.parse import urlparse
 from urllib.request import urlopen
-
 from json_ref_dict.exceptions import DocumentParseError
 
 
@@ -32,40 +31,51 @@ class Loader:
 
     loaders: Deque[DocumentLoader]
 
+    @classmethod
+    def default_loader(cls, func: DocumentLoader) -> DocumentLoader:
+        return cls(func)
+
     def __init__(self, default: DocumentLoader):
-        self.loaders = deque()  # allows playing with order.
+        self.loaders = deque()
         self.default = default
 
     def __iter__(self):
         return iter(self.loaders)
 
-    def register(self, _loader):
-        if _loader in self.loaders:
-            raise ValueError(f"{_loader} is already a known loader.")
-        self.loaders.appendleft(_loader)
-        return _loader
+    def clear(self):
+        self.loaders.clear()
 
-    def unregister(self, _loader):
-        if _loader not in self.loaders:
-            raise ValueError(f"{_loader} is not a known loader.")
-        self.loaders.remove(_loader)
+    def register(self, loader: DocumentLoader) -> DocumentLoader:
+        """LIFO registration
+        """
+        if loader in self.loaders:
+            raise ValueError(f"{loader} is already a known loader.")
+        self.loaders.appendleft(loader)
+        return loader
 
-    def __call__(self, base_uri) -> JSONSchema:
+    def unregister(self, loader: DocumentLoader):
+        if loader not in self.loaders:
+            raise ValueError(f"{loader} is not a known loader.")
+        self.loaders.remove(loader)
+
+    @lru_cache(maxsize=None)
+    def __call__(self, base_uri: str) -> JSONSchema:
         if self.loaders:
-            for _loader in self.loaders:
-                loaded = _loader(base_uri)
+            for loader in self.loaders:
+                loaded = loader(base_uri)
                 if loaded is not ...:
                     return loaded
         return self.default(base_uri)
 
 
-@lru_cache(maxsize=None)
-def default_get_document(base_uri: str) -> JSONSchema:
+@Loader.default_loader
+def get_document(base_uri: str) -> JSONSchema:
     """Load a document based on URI root."""
     try:
         return _read_document_content(base_uri)
     except Exception as exc:
-        raise DocumentParseError(f"Failed to load uri '{base_uri}'.") from exc
+        raise DocumentParseError(
+            f"Failed to load uri '{base_uri}'.") from exc
 
 
 def _read_document_content(base_uri: str) -> Dict[str, Any]:
@@ -86,13 +96,14 @@ def _read_document_content(base_uri: str) -> Dict[str, Any]:
         prefix = "" if base_uri.startswith("/") else getcwd()
         base_uri = pathlib.Path(posixpath.join(prefix, base_uri)).as_uri()
     with urlopen(base_uri) as conn:
-        _loader = _get_loader(conn)
-        content = _loader(conn)
+        parser = _get_parser(conn)
+        content = parser(conn)
     return content
 
 
-def _get_loader(conn) -> Callable:
-    """Identify the best loader based on connection."""
+def _get_parser(conn) -> Callable:
+    """Identify the best parser based on connection.
+    """
     content_type = _get_content_type(conn)
     if "json" in content_type:
         return json.load
@@ -105,14 +116,6 @@ def _get_content_type(conn) -> str:
     """
     content_type = mimetypes.guess_type(conn.url)[0] or ""
     if hasattr(conn, "getheaders"):
-        content_type = dict(conn.getheaders()).get("Content-Type", content_type)
+        content_type = dict(
+            conn.getheaders()).get("Content-Type", content_type)
     return cgi.parse_header(content_type)[0]
-
-
-# Can possibly be hotswitched by patching.
-# pylint:disable=invalid-name
-loader = Loader(default_get_document)
-
-# backward compatibility
-# pylint:disable=invalid-name
-get_document = loader

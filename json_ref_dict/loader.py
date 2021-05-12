@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
 
 class Loader:
 
-    slots = ("loaders", "default")
+    __slots__ = ("loaders", "default")
 
     loaders: Deque[DocumentLoader]
 

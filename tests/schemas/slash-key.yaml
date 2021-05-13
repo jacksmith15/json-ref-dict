@@ -1,5 +1,13 @@
 definitions:
   bar/baz:
     type: integer
+  key_with_slashpath:
+    foo/bar:
+      baz:
+        type: integer
+  nested_reference:
+    $ref: '#/definitions/key_with_slashpath'
   slash_key:
     $ref: '#/definitions/bar~1baz'
+  slash_key_recursion:
+    $ref: '#/definitions/nested_reference'

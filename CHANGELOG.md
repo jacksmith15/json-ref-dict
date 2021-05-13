@@ -13,6 +13,7 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+* Fixed recursive references with slashes in key names
 
 ## [0.6.2] - 2021-04-01
 ### Fixed

@@ -139,6 +139,9 @@ def test_materialize_slash_key():
     assert dictionary == {
         "definitions": {
             "bar/baz": {"type": "integer"},
+            "key_with_slashpath": {"foo/bar": {"baz": {"type": "integer"}}},
+            "nested_reference": {"foo/bar": {"baz": {"type": "integer"}}},
             "slash_key": {"type": "integer"},
+            "slash_key_recursion": {"foo/bar": {"baz": {"type": "integer"}}},
         }
     }

@@ -14,6 +14,7 @@ PINNED_FILE_URL = (
     "c19989a95449df587b62abea89aeb83676/tests/schemas/master.yaml"
 )
 
+
 def test_loader_registration(request):
     """Tests the loaders iterable management
     """
@@ -32,13 +33,12 @@ def test_loader_registration(request):
 
     with pytest.raises(ValueError) as exc:
         loader.unregister(useless)
-    assert str(exc.value) == f'{useless} is not a known loader.'
+    assert str(exc.value) == f"{useless} is not a known loader."
 
     loader.register(useless)
     with pytest.raises(ValueError) as exc:
         loader.register(useless)
-    assert str(exc.value) == f'{useless} is already a known loader.'
-
+    assert str(exc.value) == f"{useless} is already a known loader."
 
     loader.clear()
     assert list(loader) == []
@@ -51,33 +51,33 @@ def test_loader_registration_chain(request):
 
     @loader.register
     def no_remote(baseuri):
-        if baseuri.startswith('http://') or baseuri.startswith('https://'):
+        if baseuri.startswith("http://") or baseuri.startswith("https://"):
             return ...
-        return {'foo': 'bar'}
+        return {"foo": "bar"}
 
     @loader.register
     def file_loader(baseuri):
-        if baseuri.startswith('file://'):
-            return {'bar': 'qux'}
+        if baseuri.startswith("file://"):
+            return {"bar": "qux"}
         return ...
 
     assert list(loader) == [file_loader, no_remote]
 
-    schema = loader('file://myfile.json')
-    assert schema == {'bar': 'qux'}
+    schema = loader("file://myfile.json")
+    assert schema == {"bar": "qux"}
 
     schema = loader(PINNED_FILE_URL)
     assert dict(schema) == {
-        'definitions': {
-            'backref': {'$ref': 'other.yaml#/definitions/baz'},
-            'foo': {'type': 'string'},
-            'local_ref': {'$ref': '#/definitions/foo'},
-            'remote_ref': {'$ref': 'other.yaml#/definitions/bar'}
+        "definitions": {
+            "backref": {"$ref": "other.yaml#/definitions/baz"},
+            "foo": {"type": "string"},
+            "local_ref": {"$ref": "#/definitions/foo"},
+            "remote_ref": {"$ref": "other.yaml#/definitions/bar"},
         }
     }
 
-    schema = loader('not https')
-    assert schema == {'foo': 'bar'}
+    schema = loader("not https")
+    assert schema == {"foo": "bar"}
 
 
 class TestRefDictIORefs:

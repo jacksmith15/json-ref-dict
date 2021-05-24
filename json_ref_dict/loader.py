@@ -108,8 +108,7 @@ def _get_content_type(conn) -> str:
     """
     content_type = mimetypes.guess_type(conn.url)[0] or ""
     if hasattr(conn, "getheaders"):
-        content_type = dict(conn.getheaders()).get(
-            "Content-Type", content_type)
+        content_type = dict(conn.getheaders()).get("Content-Type", content_type)
     return cgi.parse_header(content_type)[0]
 
 

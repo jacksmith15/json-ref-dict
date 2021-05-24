@@ -92,6 +92,7 @@ def override_loader():
     @loader.register
     def _get_document(base_uri: str):
         return TEST_DATA[base_uri]
+
     try:
         yield
     finally:
@@ -99,7 +100,6 @@ def override_loader():
 
 
 class TestResolveURI:
-
     @staticmethod
     def test_get_no_ref():
         uri = URI.from_string("base/file1.json#/definitions/foo")
@@ -187,14 +187,7 @@ class TestResolveURI:
         assert result == "bar"
 
     @staticmethod
-    @pytest.mark.parametrize(
-        "field",
-        [
-            "tilda",
-            "slash",
-            "percent",
-        ],
-    )
+    @pytest.mark.parametrize("field", ["tilda", "slash", "percent"])
     def test_get_ref_with_escaped_chars(field: str):
         uri = URI.from_string(
             f"base/with-escaped-chars.json#/properties/{field}"
@@ -204,7 +197,6 @@ class TestResolveURI:
 
 
 class TestRefDict:
-
     @staticmethod
     @pytest.fixture(scope="class")
     def ref_dict():
@@ -292,7 +284,6 @@ class TestRefDict:
 
 
 class TestFromURI:
-
     @staticmethod
     def test_from_uri_list():
         ref_list = RefDict.from_uri("base/from-uri.json#/array")
@@ -327,7 +318,6 @@ class TestFromURI:
 
 
 class TestRefPointer:
-
     @staticmethod
     @pytest.fixture(scope="class")
     def uri() -> URI:

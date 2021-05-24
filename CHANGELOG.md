@@ -13,7 +13,16 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
-* Fixed recursive references with slashes in key names
+### Changed
+* `get_document` can now delegate the loading of a document to loaders.
+  `loaders` are registerable and can be chained until a document is
+  actually loaded. This allows several usecases : user/password secured
+  URL, local schema registry, special file handling...
+  The change is backward compatible and shouldn't impact existing
+  deployments.
+  
+ ### Fixed
+ * Fixed recursive references with slashes in key names
 
 ## [0.6.2] - 2021-04-01
 ### Fixed
@@ -28,7 +37,7 @@ Types of changes are:
 * Setup.py was importing the package itself, causing
   exceptions when installing by source. Following best
   practices, a regex is used to extract the version from
-  the source code. 
+  the source code.
 
 ## [0.6.0] - 2020-04-17
 ### Added

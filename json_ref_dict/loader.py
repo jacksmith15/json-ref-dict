@@ -27,6 +27,31 @@ except ImportError:  # pragma: no cover
 
 
 class Loader:
+    """Document loader singleton.
+
+    Supports registering new loaders which are used when resolving remote
+    references. Loaders are attempted in order of most recent first,
+    stopping when one succeeds.
+
+    Loaders should return ``...`` (Ellipsis) to defer to the next loader.
+
+    Example:
+
+    .. code:: python
+
+        from json_ref_dict.loader import loader
+
+        @loader.register
+        def _load_with_auth(base_uri: str) -> Dict[str, Any]:
+            if base_uri.startswith(PRIVATE_DOMAIN):
+                return requests.get(
+                    base_uri, headers=custom_auth_headers
+                ).json()
+            return ...
+
+    The default loader fetches using urlopen, and parses either yaml or
+    json.
+    """
 
     __slots__ = ("_loaders", "_default")
 
@@ -40,23 +65,28 @@ class Loader:
         return iter(self._loaders)
 
     def clear(self):
+        """Clear any custom loaders."""
         return self._loaders.clear()
 
-    def register(self, _loader):
-        if _loader in self._loaders:
-            raise ValueError(f"{_loader} is already a known loader.")
-        self._loaders.appendleft(_loader)
-        return _loader
+    def cache_clear(self):
+        """Clear the cache on the default loader."""
+        self._default.cache_clear()
 
-    def unregister(self, _loader):
-        if _loader not in self._loaders:
-            raise ValueError(f"{_loader} is not a known loader.")
-        self._loaders.remove(_loader)
+    def register(self, loader_: DocumentLoader):
+        if loader_ in self._loaders:
+            raise ValueError(f"{loader_} is already a known loader.")
+        self._loaders.appendleft(loader_)
+        return loader_
 
-    def __call__(self, base_uri) -> JSONSchema:
+    def unregister(self, loader_: DocumentLoader):
+        if loader_ not in self._loaders:
+            raise ValueError(f"{loader_} is not a known loader.")
+        self._loaders.remove(loader_)
+
+    def __call__(self, base_uri: str) -> JSONSchema:
         if self._loaders:
-            for _loader in self._loaders:
-                loaded = _loader(base_uri)
+            for loader_ in self._loaders:
+                loaded = loader_(base_uri)
                 if loaded is not ...:
                     return loaded
         return self._default(base_uri)

@@ -13,6 +13,8 @@ Types of changes are:
 * **Fixed** for any bug fixes.
 
 ## [Unreleased]
+
+## [0.7.0] - 2021-05-24
 ### Changed
 * `get_document` can now delegate the loading of a document to loaders.
   `loaders` are registerable and can be chained until a document is
@@ -133,7 +135,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.2..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.0..HEAD
+[0.7.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.2..0.7.0
 [0.6.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.1..0.6.2
 [0.6.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.0..0.6.1
 [0.6.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.5.3..0.6.0

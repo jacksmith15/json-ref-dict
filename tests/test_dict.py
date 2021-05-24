@@ -1,11 +1,10 @@
 from typing import Any, Dict, Iterable, Tuple, Union
-from unittest.mock import patch
-
 from jsonpointer import JsonPointer, JsonPointerException
 import pytest
 
 from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
 from json_ref_dict.ref_dict import RefList
+from json_ref_dict.loader import loader
 
 
 TEST_DATA = {
@@ -88,19 +87,19 @@ TEST_DATA = {
 }
 
 
-def get_document(base_uri: str):
-    return TEST_DATA[base_uri]
-
-
 @pytest.fixture(scope="module", autouse=True)
 def override_loader():
-    patcher = patch("json_ref_dict.ref_pointer.get_document", get_document)
-    mock_loader = patcher.start()
-    yield mock_loader
-    patcher.stop()
+    @loader.register
+    def _get_document(base_uri: str):
+        return TEST_DATA[base_uri]
+    try:
+        yield
+    finally:
+        loader.clear()
 
 
 class TestResolveURI:
+
     @staticmethod
     def test_get_no_ref():
         uri = URI.from_string("base/file1.json#/definitions/foo")
@@ -205,6 +204,7 @@ class TestResolveURI:
 
 
 class TestRefDict:
+
     @staticmethod
     @pytest.fixture(scope="class")
     def ref_dict():
@@ -292,6 +292,7 @@ class TestRefDict:
 
 
 class TestFromURI:
+
     @staticmethod
     def test_from_uri_list():
         ref_list = RefDict.from_uri("base/from-uri.json#/array")
@@ -326,6 +327,7 @@ class TestFromURI:
 
 
 class TestRefPointer:
+
     @staticmethod
     @pytest.fixture(scope="class")
     def uri() -> URI:
@@ -334,7 +336,7 @@ class TestRefPointer:
     @staticmethod
     @pytest.fixture(scope="class")
     def document(uri: URI) -> Dict[str, Any]:
-        return get_document(uri.root)
+        return loader(uri.root)
 
     @staticmethod
     @pytest.mark.parametrize("method", ["resolve", "get"])
@@ -435,5 +437,5 @@ class TestRefPointer:
         uri = URI.from_string(
             "base/ref-to-primitive.json#/top/ref_to_primitive"
         )
-        document = get_document(uri.root)
+        document = loader(uri.root)
         assert RefPointer(uri).resolve(document) == "foo"

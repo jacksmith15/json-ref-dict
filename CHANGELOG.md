@@ -20,6 +20,9 @@ Types of changes are:
   URL, local schema registry, special file handling...
   The change is backward compatible and shouldn't impact existing
   deployments.
+  
+ ### Fixed
+ * Fixed recursive references with slashes in key names
 
 ## [0.6.2] - 2021-04-01
 ### Fixed

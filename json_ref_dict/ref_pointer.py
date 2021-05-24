@@ -7,7 +7,7 @@ from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
 from json_ref_dict.exceptions import DocumentParseError
 from json_ref_dict.loader import get_document
-from json_ref_dict.uri import URI
+from json_ref_dict.uri import URI, parse_segment
 
 
 class RefPointer(JsonPointer):
@@ -36,7 +36,7 @@ class RefPointer(JsonPointer):
         ):
             return False, None
         remote_uri = self.uri.relative(doc["$ref"]).get(
-            *self.parts[parts_idx + 1 :]
+            *[parse_segment(part) for part in self.parts[parts_idx + 1 :]]
         )
         return True, resolve_uri(remote_uri)
 

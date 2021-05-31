@@ -14,6 +14,12 @@ Types of changes are:
 
 ## [Unreleased]
 
+* Fixed recursive references pointing to remote documents.
+  References with ref_pointer can recurse to new remote
+  documents. ref_dict URIs need to be updated to point
+  to remote documents for the relative URI resolving to
+  work.
+
 ## [0.7.0] - 2021-05-24
 ### Changed
 * `get_document` can now delegate the loading of a document to loaders.

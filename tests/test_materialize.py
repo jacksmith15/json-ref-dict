@@ -90,7 +90,7 @@ def test_materialize_name_label():
             "foo": {"type": "string", "title": "foo"},
             "local_ref": {"type": "string", "title": "foo"},
             "remote_ref": {"type": "integer", "title": "bar"},
-            "backref": {"type": "string", "title": "baz"},
+            "backref": {"type": "string", "title": "foo"},
         },
         "title": "#",
     }
@@ -118,7 +118,7 @@ def test_materialize_uri_label():
             },
             "backref": {
                 "type": "string",
-                "uri": "tests/schemas/other.yaml#/definitions/baz",
+                "uri": "tests/schemas/master.yaml#/definitions/foo",
             },
         },
     }
@@ -130,6 +130,15 @@ def test_materialize_name_label_circular():
     assert isinstance(dictionary, dict)
     assert dictionary["definitions"]["title"] == "definitions"
     assert dictionary["definitions"]["foo"]["title"] == "#"
+
+
+def test_materialize_recursive_files():
+    ref_dict = RefDict("tests/schemas/recursive_depth0.yaml#/")
+    dictionary = materialize(ref_dict)
+    assert isinstance(dictionary, dict)
+    assert dictionary == {
+        "definitions": {"local_ref": {"sublevel": {"type": "string"}}}
+    }
 
 
 def test_materialize_slash_key():

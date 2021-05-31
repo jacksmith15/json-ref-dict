@@ -1,0 +1,3 @@
+definitions:
+  local_ref:
+    $ref: "./recursive_depth1.yaml#/definitions1/depth1foo"

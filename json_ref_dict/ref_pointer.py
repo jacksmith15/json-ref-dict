@@ -9,7 +9,8 @@ from json_ref_dict.exceptions import DocumentParseError
 from json_ref_dict.loader import get_document
 from json_ref_dict.uri import URI, parse_segment
 
-UriValuePair = Tuple[URI, Union[List, Dict, None, bool, str, int, float]]
+ResolvedValue = Union[List, Dict, None, bool, str, int, float]
+UriValuePair = Tuple[URI, ResolvedValue]
 
 
 class RefPointer(JsonPointer):
@@ -129,10 +130,8 @@ class RefPointer(JsonPointer):
 
 
 @lru_cache(maxsize=None)
-def resolve_remote_uri(
-    uri: URI
-) -> Tuple[URI, Union[List, Dict, None, bool, str, int, float]]:
-    """Find the value for a given URI.
+def resolve_remote_uri(uri: URI) -> UriValuePair:
+    """Find the URI and document value for a given starting URI.
 
     Loads the document and resolves the pointer, bypassing refs.
     Utilises `lru_cache` to avoid re-loading multiple documents.
@@ -149,6 +148,10 @@ def resolve_remote_uri(
     return remote_uri if remote_uri else uri, value
 
 
-def resolve_uri(uri: URI) -> Union[List, Dict, None, bool, str, int, float]:
+def resolve_uri(uri: URI) -> ResolvedValue:
+    """Find the value for a given URI.
+
+    Loads the document and resolves the pointer, bypassing refs.
+    """
     _, value = resolve_remote_uri(uri)
     return value

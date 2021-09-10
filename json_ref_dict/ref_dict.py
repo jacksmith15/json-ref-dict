@@ -1,14 +1,14 @@
 from collections import UserDict, UserList
 from typing import Any, Union
 
-from json_ref_dict.ref_pointer import resolve_remote_uri, UriValuePair
+from json_ref_dict.ref_pointer import resolve_uri_to_urivalue_pair, UriValuePair
 from json_ref_dict.uri import parse_segment, URI
 
 
 def _resolve_uri(uri: Union[str, URI]) -> UriValuePair:
     """Recurse to the value with the given URI as a starting point"""
     uri = URI.from_string(uri) if isinstance(uri, str) else uri
-    return resolve_remote_uri(uri)
+    return resolve_uri_to_urivalue_pair(uri)
 
 
 class RefDict(UserDict):  # pylint: disable=too-many-ancestors

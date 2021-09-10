@@ -1,11 +1,11 @@
 from typing import Any, Dict, Iterable, Tuple, Union
+from unittest.mock import patch
 from jsonpointer import JsonPointer, JsonPointerException
 import pytest
 
 from json_ref_dict import resolve_uri, RefDict, RefPointer, URI
 from json_ref_dict.ref_dict import RefList
-from json_ref_dict.loader import loader
-
+from json_ref_dict.loader import get_document, loader
 
 TEST_DATA = {
     "base/file1.json": {
@@ -121,6 +121,21 @@ class TestResolveURI:
         )
         remote_ref = resolve_uri(remote_ref_uri)
         assert remote_ref == {"type": "integer"}
+
+    @staticmethod
+    def test_get_remote_ref_cache_clear_reloads():
+        remote_ref_uri = URI.from_string(
+            "base/file1.json#/definitions/remote_ref"
+        )
+        resolve_uri.cache_clear()
+        with patch(f"{resolve_uri.__module__}.get_document") as mock_doc:
+            mock_doc.side_effect = get_document
+            _ = [resolve_uri(remote_ref_uri) for _ in range(3)]
+            assert mock_doc.call_count == 2  # file1 and file2 loaded
+            resolve_uri.cache_clear()
+            remote_ref = resolve_uri(remote_ref_uri)
+            assert mock_doc.call_count == 4
+            assert remote_ref == {"type": "integer"}
 
     @staticmethod
     def test_get_backref():

@@ -6,7 +6,7 @@ from urllib.parse import unquote
 from jsonpointer import JsonPointer, JsonPointerException, _nothing
 
 from json_ref_dict.exceptions import DocumentParseError
-from json_ref_dict.loader import get_document
+from json_ref_dict.loader import get_document, JSONSchema
 from json_ref_dict.uri import URI, parse_segment
 
 ResolvedValue = Union[List, Dict, None, bool, str, int, float]
@@ -55,7 +55,7 @@ class RefPointer(JsonPointer):
             *[parse_segment(part) for part in self.parts[parts_idx + 1 :]]
         )
 
-        resolved_remote_uri, value = resolve_remote_uri(remote_uri)
+        resolved_remote_uri, value = resolve_uri_to_urivalue_pair(remote_uri)
         return resolved_remote_uri, value
 
     def resolve(self, doc: Any, default: Any = _nothing) -> Any:
@@ -129,29 +129,66 @@ class RefPointer(JsonPointer):
         return result, part
 
 
-@lru_cache(maxsize=None)
-def resolve_remote_uri(uri: URI) -> UriValuePair:
-    """Find the URI and document value for a given starting URI.
+def nested_lru_cache(nested_cache_funcs, *args, **kwargs):
+    """Implement lru_cache that also resets the underlying document cache.
 
-    Loads the document and resolves the pointer, bypassing refs.
-    Utilises `lru_cache` to avoid re-loading multiple documents.
+    URI resolver functions share a common document cache that
+    is implemented with lru_cache.
+    Cache clearing on the resolve-functions needs to reset
+    the underlying cache with a custom cache_clear implementation.
     """
+
+    def decorator(func):
+        func = lru_cache(*args, **kwargs)(func)
+        orig_cache_clear = func.cache_clear
+
+        def _custom_clear():
+            for func in nested_cache_funcs:
+                func.cache_clear()
+            orig_cache_clear()
+
+        func.cache_clear = _custom_clear
+        return func
+
+    return decorator
+
+
+@lru_cache(maxsize=None)
+def _resolve_cached_root_doc(uri: URI) -> JSONSchema:
     try:
-        document = get_document(uri.root)
+        return get_document(uri.root)
     except DocumentParseError as exc:
         raise DocumentParseError(
             f"Failed to load base document of {uri}."
         ) from exc
 
+
+@nested_lru_cache([_resolve_cached_root_doc], maxsize=None)
+def resolve_uri_to_urivalue_pair(uri: URI) -> UriValuePair:
+    """Find the value-containing URI and actual value for a given starting URI.
+
+    The starting URI can point to another document than where the final
+    value is found. This method returns a valid URI to the containing document.
+
+    Loads the document and resolves the pointer, bypassing refs.
+    Utilises `lru_cache` to avoid re-loading multiple documents.
+
+    :return: URI to the document containing the value, and the value itself.
+
+    :raises DocumentParseError: if the input URI root does not point to
+        a valid document.
+    """
+    document = _resolve_cached_root_doc(uri)
     pointer = RefPointer(uri)
     remote_uri, value = pointer.resolve_with_uri(document)
     return remote_uri if remote_uri else uri, value
 
 
+@nested_lru_cache([resolve_uri_to_urivalue_pair], maxsize=None)
 def resolve_uri(uri: URI) -> ResolvedValue:
     """Find the value for a given URI.
 
     Loads the document and resolves the pointer, bypassing refs.
     """
-    _, value = resolve_remote_uri(uri)
+    _, value = resolve_uri_to_urivalue_pair(uri)
     return value

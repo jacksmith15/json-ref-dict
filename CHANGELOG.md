@@ -14,6 +14,8 @@ Types of changes are:
 
 ## [Unreleased]
 
+## [0.7.1] - 2021-09-10
+
 ### Fixed
 * Fixed recursive references pointing to remote documents.
   References with ref_pointer can recurse to new remote
@@ -142,7 +144,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.0..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.1..HEAD
+[0.7.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.0..0.7.1
 [0.7.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.2..0.7.0
 [0.6.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.1..0.6.2
 [0.6.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.0..0.6.1

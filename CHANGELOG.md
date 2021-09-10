@@ -14,6 +14,7 @@ Types of changes are:
 
 ## [Unreleased]
 
+### Fixed
 * Fixed recursive references pointing to remote documents.
   References with ref_pointer can recurse to new remote
   documents. ref_dict URIs need to be updated to point

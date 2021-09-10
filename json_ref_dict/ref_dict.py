@@ -1,8 +1,14 @@
 from collections import UserDict, UserList
 from typing import Any, Union
 
-from json_ref_dict.ref_pointer import resolve_uri
+from json_ref_dict.ref_pointer import resolve_uri_to_urivalue_pair, UriValuePair
 from json_ref_dict.uri import parse_segment, URI
+
+
+def _resolve_uri(uri: Union[str, URI]) -> UriValuePair:
+    """Recurse to the value with the given URI as a starting point"""
+    uri = URI.from_string(uri) if isinstance(uri, str) else uri
+    return resolve_uri_to_urivalue_pair(uri)
 
 
 class RefDict(UserDict):  # pylint: disable=too-many-ancestors
@@ -15,8 +21,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
 
     def __init__(self, uri: Union[str, URI], *args, **kwargs):
         """On instantiation, retrieve the data from the URI."""
-        self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        value = resolve_uri(self.uri)
+        self.uri, value = _resolve_uri(uri)
         if not isinstance(value, dict):
             raise TypeError(
                 f"The value at '{uri}' is not an object. Got '{value}'."
@@ -38,8 +43,7 @@ class RefDict(UserDict):  # pylint: disable=too-many-ancestors
         Looks ahead at the raw value, and then returns a RefDict, RefList, or
         other value.
         """
-        uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        value = resolve_uri(uri)
+        uri, value = _resolve_uri(uri)
         if isinstance(value, dict):
             return RefDict(uri)
         if isinstance(value, list):
@@ -57,8 +61,7 @@ class RefList(UserList):  # pylint: disable=too-many-ancestors
 
     def __init__(self, uri: Union[str, URI], *args, **kwargs):
         """On instantiation, retrieve the data from the URI."""
-        self.uri = URI.from_string(uri) if isinstance(uri, str) else uri
-        value = resolve_uri(self.uri)
+        self.uri, value = _resolve_uri(uri)
         if not isinstance(value, list):
             raise TypeError(
                 f"The value at '{uri}' is not an array. Got '{value}'."

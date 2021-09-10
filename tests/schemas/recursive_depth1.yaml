@@ -1,0 +1,3 @@
+definitions1:
+  depth1foo:
+    $ref: "./recursive_depth2.yaml#/definitions2/depth2foo"

@@ -1,0 +1,6 @@
+definitions2:
+  depth2foo:
+    sublevel:
+      $ref: "#/definitions2/baz"
+  baz:
+    type: string

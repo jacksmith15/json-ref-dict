@@ -8,4 +8,4 @@ ipdb
 pre-commit
 safety
 black
-PyYaml==5.2
+PyYaml==5.4

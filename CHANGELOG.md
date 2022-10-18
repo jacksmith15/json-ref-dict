@@ -14,6 +14,9 @@ Types of changes are:
 
 ## [Unreleased]
 
+* Added support for references which point to within the object containing the
+  `$ref` key.
+
 ## [0.7.1] - 2021-09-10
 
 ### Fixed

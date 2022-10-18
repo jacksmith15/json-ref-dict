@@ -168,3 +168,8 @@ def test_immediate_references_can_be_bypassed():
 def test_local_root_ref():
     value = RefDict.from_uri("tests/schemas/root-ref.json#/")
     assert value == {"type": "integer"}
+
+
+def test_local_conflicting_keys():
+    value = RefDict.from_uri("tests/schemas/conflicting-keys.yaml#/conflicting/value")
+    assert value == "good"

@@ -1,0 +1,5 @@
+conflicting:
+  $ref: "#/real"
+  value: "bad"
+real:
+  value: "good"

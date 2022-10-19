@@ -47,10 +47,47 @@ class RefPointer(JsonPointer):
         :return: tuple indicating (1) if doc was a ref (the ref URI returned)
             and (2) what that ref value was.
         """
-        if not (
-            isinstance(doc, abc.Mapping) and isinstance(doc.get("$ref"), str)
-        ):
+
+        is_ref = isinstance(doc, abc.Mapping) and isinstance(
+            doc.get("$ref"), str
+        )
+
+        if not is_ref:
             return None, None
+
+        ref = doc["$ref"]
+
+        is_local = ref.startswith("#")
+
+        if is_local:
+            # If this reference is local to this document, check the following
+            # to determine if this reference is actually pointing to within
+            # an object containing a `$ref` which is currently being resolved:
+            #
+            # 1) If we are already resolving this reference (i.e, `self` is the
+            #    same as the reference we just found)
+            # 2) This reference doesn't just point to itself (i.e, there are
+            #    more parts to resolve)
+            #
+            # If both these things are true, ignore this `$ref`, and allow the
+            # existing resolve process (represented by `self`) to continue.
+
+            # If a URI ended in `/`, there will be an empty item on the end of
+            # `parts`. For our purposes, this is the same as if it were not
+            # present. Modify the ephemeral `ref_pointer` `parts` to resolve
+            # this discrepancy
+            ref_pointer = RefPointer(ref)
+            if self.parts[-1] == "" and ref_pointer.parts[-1] != "":
+                ref_pointer.parts.append("")
+
+            is_same = self.parts == ref_pointer.parts
+            has_more = parts_idx + 1 < len(self.parts)
+
+            if is_same and has_more:
+                # `$ref` points to within the JSON object represented by `self`.
+                # Ignore.
+                return None, None
+
         remote_uri = self.uri.relative(doc["$ref"]).get(
             *[parse_segment(part) for part in self.parts[parts_idx + 1 :]]
         )
@@ -113,6 +150,7 @@ class RefPointer(JsonPointer):
                 if default is _nothing:
                     raise
                 return self.uri, default
+
         return self.uri, doc
 
     def set(self, doc: Any, value: Any, inplace: bool = True) -> NoReturn:

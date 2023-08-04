@@ -49,5 +49,6 @@ setup(
     ],
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     install_requires=REQUIREMENTS_FILE,
+    license="MIT",
     dependency_links=[],
 )

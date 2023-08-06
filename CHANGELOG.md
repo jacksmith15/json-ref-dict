@@ -14,6 +14,8 @@ Types of changes are:
 
 ## [Unreleased]
 
+## [0.7.2] - 2023-08-06
+
 ### Fixed
 * Added license to `setup.py`
 
@@ -147,7 +149,8 @@ Types of changes are:
 ## [0.0.0]
 Nothing here.
 
-[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.1..HEAD
+[Unreleased]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.2..HEAD
+[0.7.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.1..0.7.2
 [0.7.1]: http://github.com/jacksmith15/json-ref-dict/compare/0.7.0..0.7.1
 [0.7.0]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.2..0.7.0
 [0.6.2]: http://github.com/jacksmith15/json-ref-dict/compare/0.6.1..0.6.2
